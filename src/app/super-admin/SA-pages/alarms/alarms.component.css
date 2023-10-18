@@ -1,68 +1,37 @@
 .content{
   padding: 1rem;
   padding-top: 5rem;
-}
+ margin-bottom: 2rem;
 
-
-
-tr:nth-child(even){
-background-color: whitesmoke;
-}
-  
-tr:nth-child(odd){
-background-color: whitesmoke;
-}
-th{
-text-align: center;
-}
-
-td{
-text-align: center;
-}
-
-@media screen and (max-width: 768px){
-  
-}
-.mat-table-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background-color: white; 
-}
-
-.example-table-container {
-  position: relative;
-  min-height: 200px;
-  max-height: 500px;
-  overflow: auto;
-  width: 550px;
-  max-width: 100%;
 }
 .example-container {
   height: 500px;
+  max-width: 100%;
   overflow: auto;
-}
-.container{
-  margin-bottom:2.5rem;
-}
-.demo-button-container {
-  padding-bottom: 16px;
+
 }
 
-.demo-button + .demo-button {
-  margin-left: 8px;
+table {
+  width: 800px;
 }
-@media(max-width:501px){
-  .text-hide{
-    display: none;
+th{
+  text-align: center;
+}
+td{
+  text-align: center;
+}
+.card
+{
+  border-radius: 10px;
+}
+
+@media(400px<= width){
+  .text-heading{
+    font-size: 40px;
   }
 }
-
-
-
-
-
-
-
-
-
+@media(100px<= width <= 350px){
+  .text-heading{
+    font-size: 20px;
+  }
+}

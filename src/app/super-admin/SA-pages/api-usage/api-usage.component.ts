@@ -17,6 +17,7 @@ export class ApiUsageComponent implements OnInit {
   displayGraphFull2: boolean = false;
   displayGraphFull3: boolean = false;
   displayGraphFull4: boolean = false;
+  transportcount: any;
 
   constructor(
     public saService: SaService,
@@ -28,6 +29,7 @@ export class ApiUsageComponent implements OnInit {
   ngOnInit(): void {
     this.gettotaldevicecount();
     this.saService.isPageLoading(true);
+    this.gettransportApiCount();
 
   }
 
@@ -59,6 +61,16 @@ export class ApiUsageComponent implements OnInit {
   fullScrrenGraph4(){
     this.displayGraphFull4 = !this.displayGraphFull4;
   }
-
+  gettransportApiCount(){
+    this.service.gettransportApiCount().subscribe(
+      (transportcount) =>{
+      transportcount = this.transportcount;
+       console.log(transportcount);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
+   }
 
 }

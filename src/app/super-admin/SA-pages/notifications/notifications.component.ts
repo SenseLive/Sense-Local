@@ -81,7 +81,7 @@ export class NotificationsComponent implements OnInit{
   tick = false; 
   selectedReadStatus: number | null = null;
 
-  displayedColumns: string[] = ['id','created_time', 'message','type','subject','recipient','isRead'];
+  displayedColumns: string[] = ['id','created_time', 'message','type','subject','recipient'];// ,'isRead'
   dataSource = new MatTableDataSource(ELEMENT_DATA);
 
   displayedColumns2: string[] = ['check','create_time', 'type','subject','message','actions'];
@@ -136,6 +136,14 @@ export class NotificationsComponent implements OnInit{
     this.dialog.open(SendNotificationComponent, {
       width: '50%', // Set the width to 400px
     });
+  }
+
+  showSearchInput: boolean = false;
+  hideSearchInput() {
+    this.showSearchInput = false;
+  }
+  toggleSearchInput() {
+    this.showSearchInput = !this.showSearchInput;
   }
 }
 

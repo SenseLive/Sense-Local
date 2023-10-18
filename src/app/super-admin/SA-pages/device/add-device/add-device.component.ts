@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
-import { FormControl, Validators } from '@angular/forms';
 import { SuperAdminService } from 'src/app/super-admin/super-admin.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthService } from 'src/app/login/auth/auth.service';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import {  MatDialogRef } from '@angular/material/dialog';
 import { DeviceComponent } from '../device.component';
 
 
@@ -33,9 +32,6 @@ export class AddDeviceComponent {
   onSubmit() {
   this.service.addDevice(this.formData).subscribe(response => {
     const message = 'API Response:' + JSON.stringify(response);
-     console.log(message);
-   //  console.log(this.CompanyEmail);
-   //  console.log(this.CompanyName);
     this.snackBar.open(message, 'Close',{
       duration: 5000, 
       horizontalPosition: 'center',
@@ -43,9 +39,6 @@ export class AddDeviceComponent {
     });
   });
   }
-  
-
-  
 
   onSaveClick(): void {
     if(this.formData.valid){

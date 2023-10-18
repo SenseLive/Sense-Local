@@ -37,7 +37,8 @@ export interface PeriodicElement{
 })
 
 export class UserComponent implements OnInit{
-
+ 
+  showSearchInput: boolean = false;
   currentTime: Date = new Date();
   displayedColumns: string[] = ['UserId','Username','CompanyName','Designation','PersonalEmail','Location','ContactNo','actions'];
   dataSource = new MatTableDataSource<PeriodicElement>([]);
@@ -172,5 +173,11 @@ toggleBlockUser(user: PeriodicElement) {
     dialogRef.afterClosed().subscribe(deviceAdded => {   
       this.getUserData();
      });
+  }
+  hideSearchInput() {
+    this.showSearchInput = false;
+  }
+  toggleSearchInput() {
+    this.showSearchInput = !this.showSearchInput;
   }
 }

@@ -26,6 +26,7 @@ const Data: PeriodicElement[] = [
 
 })
 export class DeviceComponent {
+  showSearchInput: boolean = false;
   loading: boolean = true; 
   currentTime: Date = new Date();
   displayedColumns: string[] = ['EntryId','DeviceUID','DeviceLocation','DeviceName','CompanyEmail','CompanyName','IssueDate','status','SMS','email','type','endDate'];
@@ -56,10 +57,6 @@ export class DeviceComponent {
     );
   }
 
-
-
-  
-  
   applyFilter(event: Event) {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
@@ -73,6 +70,28 @@ export class DeviceComponent {
         dialogConfig.maxWidth = '90vw';
         const dialogRef = this.dialog.open(AddDeviceComponent, dialogConfig);
         dialogRef.afterClosed().subscribe(deviceAdded => {});
+      }
+
+      refreshData() {
+        this.getDeviceDetail();
+      }
+      toggleSearchInput() {
+        this.showSearchInput = !this.showSearchInput;
+      }
+      hideSearchInput() {
+        this.showSearchInput = false;
+      }
+      getStatusStyle(status: string): any {
+        switch (status) {
+          case 'heating':
+            return { color: 'red' };
+          case 'offline':
+            return { color: 'blue' };
+          case 'online':
+            return { color: 'green' };
+          default:
+            return {}; // No additional styling for other statuses
+        }
       }
  
  }

@@ -26,6 +26,7 @@ const ELEMENT_DATA: PeriodicElement[] = [];
 
 export class CompanyComponent implements OnInit{
   
+  showSearchInput: boolean = false;
   displayedColumns: string[] = ['id','company_name','total_users','active_users','inactive_users','created_at','updated_at'];
   dataSource = new MatTableDataSource<PeriodicElement>([]);
   
@@ -57,6 +58,13 @@ export class CompanyComponent implements OnInit{
     dialogConfig.data = { company }; // Make sure `company` contains the data you expect
     const dialogRef = this.dialog.open(EditCompanyComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(deviceAdded => {});
+  }
+
+  hideSearchInput() {
+    this.showSearchInput = false;
+  }
+  toggleSearchInput() {
+    this.showSearchInput = !this.showSearchInput;
   }
   
 }

@@ -53,8 +53,7 @@ export class AlarmsComponent implements OnInit{
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  openEditAlarmsDialog(user: any): void {
-    // console.log(user);
+  openEditAlarmsDialog(user: any): void {;
      const dialogConfig = new MatDialogConfig();
      dialogConfig.width = '300px';
      dialogConfig.height = 'auto';
@@ -65,4 +64,11 @@ export class AlarmsComponent implements OnInit{
        this.getAlarms();
       });
    }
+   showSearchInput: boolean = false;
+  hideSearchInput() {
+    this.showSearchInput = false;
+  }
+  toggleSearchInput() {
+    this.showSearchInput = !this.showSearchInput;
+  }
 }

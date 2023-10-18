@@ -1,66 +1,37 @@
-
 .content{
   padding: 1rem;
   padding-top: 5rem;
-}
-tr:nth-child(even){
-background-color: whitesmoke;
-}
-  
-tr:nth-child(odd){
-background-color: whitesmoke;
-}
-th{
-text-align: center;
-z-index: 1;
-}
+ margin-bottom: 2rem;
 
-td{
-text-align: center;
-}
-
-@media screen and (max-width: 768px){
-  
-}
-.mat-table-sticky {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background-color: white; 
-}
-.example-table-container {
-  position: relative;
-  min-height: 200px;
-  max-height: 500px;
-  overflow: auto;
-  width: 550px;
-  max-width: 100%;
 }
 .example-container {
   height: 500px;
+  max-width: 100%;
   overflow: auto;
-}
-.container{
-  margin-bottom:2.5rem;
-}
-.clock {
-  text-align: center;
-}
-.animated-clock {
-  font-size: 2rem;
-  color: plum;
-  background-color: black;
-  padding: 10px;
-  border-radius: 10px;
-  height: 60px;
-  animation: fade-in 1s ease-in-out;
+
 }
 
-@keyframes fade-in {
-  0% {
-    opacity: 0;
+table {
+  width: 800px;
+}
+th{
+  text-align: center;
+}
+td{
+  text-align: center;
+}
+.card
+{
+  border-radius: 10px;
+}
+
+@media(400px<= width){
+  .text-heading{
+    font-size: 40px;
   }
-  100% {
-    opacity: 1;
+}
+@media(100px<= width <= 350px){
+  .text-heading{
+    font-size: 20px;
   }
 }

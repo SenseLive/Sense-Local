@@ -2,28 +2,36 @@
   padding: 1rem;
   padding-top: 5rem;
  margin-bottom: 2rem;
+
 }
-.demo-button-container {
-  padding-bottom: 16px;
+.example-container {
+  height: 500px;
+  max-width: 100%;
+  overflow: auto;
+
 }
 
-
-.demo-button + .demo-button {
-  margin-left: 8px;
-  background-color:#263238; 
+table {
+  width: 800px;
 }
-@media(max-width:501px){
-  .text-hide{
-    display: none;
+th{
+  text-align: center;
+}
+td{
+  text-align: center;
+}
+.card
+{
+  border-radius: 10px;
+}
+
+@media(400px<= width){
+  .text-heading{
+    font-size: 40px;
   }
 }
-
-
-  .progress-bar {
-    background-color: #58C175; /* Set the desired color */
+@media(100px<= width <= 350px){
+  .text-heading{
+    font-size: 20px;
   }
-
-  /* CSS class to expand the graph to full screen */
-
-
-  
+}

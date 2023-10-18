@@ -71,4 +71,12 @@ export class ApitrackerComponent implements OnInit {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
+
+  showSearchInput: boolean = false;
+  hideSearchInput() {
+    this.showSearchInput = false;
+  }
+  toggleSearchInput() {
+    this.showSearchInput = !this.showSearchInput;
+  }
 }
