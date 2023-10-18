@@ -9,7 +9,7 @@ import { EncrptService } from './services/encrpt.service'
 import { HttpClientModule } from '@angular/common/http';
 import { MqttModule, IMqttServiceOptions } from 'ngx-mqtt';
 
-
+import { HashLocationStrategy,LocationStrategy } from '@angular/common';
 
 const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
   hostname: 'broker.emqx.io',
@@ -31,7 +31,7 @@ const MQTT_SERVICE_OPTIONS: IMqttServiceOptions = {
     MqttModule.forRoot(MQTT_SERVICE_OPTIONS),
     
   ],
-  providers: [EncrptService],
+  providers: [EncrptService,{provide : LocationStrategy , useClass : HashLocationStrategy}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
