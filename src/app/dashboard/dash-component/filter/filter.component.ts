@@ -4,6 +4,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { DashDataService } from '../../dash-data-service/dash-data.service';
 import { AuthService } from '../../../login/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import 'jspdf-autotable';
 
 @Component({
   selector: 'app-filter',
@@ -49,6 +50,30 @@ export class FilterComponent {
     this.startDate = currentDate;
   }
 
+  downloadPDF() {
+    const backendResponse = sessionStorage.getItem('data');
+    if (backendResponse !== null) {
+      const parsedData = JSON.parse(backendResponse);
+      const dataArray = parsedData.data;
+      const jsPDF = require('jspdf');
+      const columns = Object.keys(dataArray[0]);
+      const rows = dataArray.map((item: Record<string, string | number>) => Object.values(item));
+    
+      const doc = new jsPDF.default();
+    
+      doc.autoTable({
+        head: [columns],
+        body: rows,
+      });
+    
+      doc.save('report_data.pdf');
+    } else {
+      this.snackBar.open('No data found!', 'Dismiss', {
+        duration: 2000
+      });
+    }
+  }
+  
 
   adjustDialogWidth() {
     const screenWidth = window.innerWidth;

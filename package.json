@@ -26,6 +26,8 @@
     "buffer": "^6.0.3",
     "crypto-js": "^4.1.1",
     "highcharts": "^11.1.0",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.7.1",
     "mqtt": "^4.3.7",
     "ngx-material-timepicker": "^13.0.3",
     "ngx-mqtt": "^16.1.0",
