@@ -21,7 +21,8 @@
               <div class="row" *ngIf="device.DeviceType === 'th'">
                 <div class="col-6 d-flex">
                   <img src="../../../../assets/img/tm.gif" class="card-img">
-                  <div class="image-text"> {{ deviceData[getIndex(device.DeviceUID)]?.Temperature }} &deg;C</div>
+                  <div class="image-text"> {{ deviceData[getIndex(device.DeviceUID)]?.Temperature }} &deg;C
+                  </div>
                 </div>
                 <div class="col-6 d-flex">
                   <img src="../../../../assets/img/hm.gif" class="card-img">
@@ -50,6 +51,7 @@
               </div>
             </mat-card-content>
           </mat-card>
+          <div class="type-text" *ngIf="device.DeviceType === 'ryb'">RYB</div>
         </div>
         <div class="col-2" *ngIf="getUserType() === 'Admin'">
           <div class="d-flex flex-column align-items-left">

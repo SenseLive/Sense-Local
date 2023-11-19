@@ -44,22 +44,32 @@ export class DataComponent implements OnInit {
 
 
   ngOnInit() {
-    const sessionData = sessionStorage.getItem('data');
-    const sessionDataStatus = sessionStorage.getItem('dataStatus');
-    const sessionDevice = sessionStorage.getItem('device');
-    const sessionDeviceType = sessionStorage.getItem('deviceType');
+  const sessionData = sessionStorage.getItem('data');
+  const sessionDataStatus = sessionStorage.getItem('dataStatus');
+  const sessionDevice = sessionStorage.getItem('device');
+  const sessionDeviceType = sessionStorage.getItem('deviceType');
+  
+  const loadData = () => {
     if (sessionData && sessionDataStatus && sessionDevice && sessionDeviceType) {
       const jsonData = JSON.parse(sessionData);
       const jsonDataStatus = JSON.parse(sessionDataStatus);
-      this.processChartData(jsonData);
-      this.createDonutChart(jsonDataStatus.dataStatus);
-      this.fetchDeviceInfo(sessionDevice);
       this.DeviceType = sessionDeviceType;
-      console.log("sessionDeviceType :-",this.DeviceType);
+      console.log("sessionDeviceType :-", this.DeviceType);
+
+      // Use setTimeout for the delay
+      setTimeout(() => {
+        this.processChartData(jsonData);
+        this.createDonutChart(jsonDataStatus.dataStatus);
+        this.fetchDeviceInfo(sessionDevice);
+      }, 1000);
     } else {
       this.getUserDevices();
-    }  
-  }
+    }
+  };
+
+  loadData();
+}
+
 
   getUserDevices() {
     this.CompanyEmail = this.authService.getCompanyEmail();
@@ -284,45 +294,69 @@ export class DataComponent implements OnInit {
           ]
         },
         data: this.temperatureData
+      },
+      {
+        name: 'Humitidy',
+        color: {
+          linearGradient: {
+            x1: 0,
+            x2: 0,
+            y1: 0,
+            y2: 1
+          },
+          stops: [
+            [0, 'rgba(0, 0, 255, 1)'],    // Start color (blue)
+            [1, 'rgba(0, 255, 255, 0.3)'] // End color (cyan)
+          ]
+        },
+        data: this.humidityData
       }] as any
     } as Highcharts.Options);
   }
 
-  openFilterDailog(): void{
+  openFilterDailog(): void {
     const dialogConfig = new MatDialogConfig();
-    dialogConfig.width = '500px'; // Set the width of the dialog
-    dialogConfig.height = 'auto'; // Let the height adjust automatically
-    dialogConfig.maxWidth = '90vw'; // Set the maximum width as a percentage of the viewport width
+    dialogConfig.width = '500px';
+    dialogConfig.height = 'auto';
+    dialogConfig.maxWidth = '90vw';
 
     const dialogRef = this.dialog.open(FilterComponent, dialogConfig);
-
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && result.data && result.dataStatus && result.device && result.deviceType) {
         sessionStorage.setItem('data', JSON.stringify(result.data));
         sessionStorage.setItem('dataStatus', JSON.stringify(result.dataStatus));
-        sessionStorage.setItem('device',result.device);
+        sessionStorage.setItem('device', result.device);
         sessionStorage.setItem('deviceType', result.deviceType);
         this.DeviceType = result.deviceType;
         console.log("Filter Interval Device Type :- ", this.DeviceType);
-        this.processChartData(result.data);
-        this.createDonutChart(result.dataStatus.dataStatus);
-        this.fetchDeviceInfo(result.device);
-        this.router.navigate([this.router.url]);
+
+        // Introduce a delay before processing the result
+        setTimeout(() => {
+          this.processChartData(result.data);
+          this.createDonutChart(result.dataStatus.dataStatus);
+          this.fetchDeviceInfo(result.device);
+          this.router.navigate([this.router.url]);
+        }, 1000); // Adjust the delay as needed
       } else {
         const sessionData = sessionStorage.getItem('data');
         const sessionDataStatus = sessionStorage.getItem('dataStatus');
         const sessionDevice = sessionStorage.getItem('device');
         const sessionDeviceType = sessionStorage.getItem('deviceType');
+
         if (sessionData && sessionDataStatus && sessionDevice && sessionDeviceType) {
           const jsonData = JSON.parse(sessionData);
           const jsonDataStatus = JSON.parse(sessionDataStatus);
           this.DeviceType = sessionDeviceType;
-          console.log("Filter Cloose Device Type :- ", this.DeviceType);
-          this.processChartData(jsonData);
-          this.createDonutChart(jsonDataStatus.dataStatus);
-          this.fetchDeviceInfo(sessionDevice);
-          this.router.navigate([this.router.url]);
+          console.log("Filter Close Device Type :- ", this.DeviceType);
+
+          // Introduce a delay before processing the result
+          setTimeout(() => {
+            this.processChartData(jsonData);
+            this.createDonutChart(jsonDataStatus.dataStatus);
+            this.fetchDeviceInfo(sessionDevice);
+            this.router.navigate([this.router.url]);
+          }, 1000); // Adjust the delay as needed
         } else {
           this.snackBar.open('No session storage data available!', 'Dismiss', {
             duration: 2000
@@ -333,6 +367,7 @@ export class DataComponent implements OnInit {
       }
     });
   }
+
 
   fetchDefaultData() {
     if(this.selectedDevice){
