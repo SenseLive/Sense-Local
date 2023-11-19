@@ -17,12 +17,15 @@ export class AddDeviceComponent implements OnInit{
   UserType!: string;
   ContactNo!: string;
   PersonalEmail!: string;
+  
 
   errorMessage = '';
   TriggerValue = new FormControl('', [Validators.required, Validators.pattern(/^\d*\.?\d+$/), Validators.min(0), Validators.max(100)]);
   DeviceName = new FormControl('', [Validators.required]);
   DeviceUID = new FormControl('', [Validators.required]);
   DeviceLocation = new FormControl('', [Validators.required]);
+  DeviceType = new FormControl('', [Validators.required]);
+    
 
   @HostListener('window:resize')
   onWindowResize() {
@@ -65,7 +68,8 @@ export class AddDeviceComponent implements OnInit{
         CompanyName: this.CompanyName,
         type : this.UserType,
         SMS:this.ContactNo,
-        email:this.PersonalEmail
+        email:this.PersonalEmail,
+        DeviceType: this.DeviceType.value
       }
       
       const triggerData = {
