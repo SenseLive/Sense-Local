@@ -7,6 +7,7 @@ import { FilterComponent } from '../../dash-component/filter/filter.component';
 import { DashDataService } from '../../dash-data-service/dash-data.service';
 import { AuthService } from '../../../login/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 HighchartsMore(Highcharts);
 
 @Component({
@@ -20,7 +21,8 @@ export class DataComponent implements OnInit {
     private DashDataService: DashDataService,
     private authService: AuthService,
     public snackBar: MatSnackBar,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private router: Router
   ) {}
   
   deviceOptions: any[] = [];
@@ -28,10 +30,14 @@ export class DataComponent implements OnInit {
   selectedDeviceInterval: any = '1hour';    
   CompanyEmail!: string | null;
   temperatureData: any[] = [];
+  temperatureRData: any[] = [];
+  temperatureYData: any[] = [];
+  temperatureBData: any[] = [];
   humidityData: any[] = [];
   timestampData: any[] = [];
   DeviceName!: any;
   DeviceStatus!: any;
+  DeviceType!: any;
   DeviceLastUpdatedTime!: any;
   DeviceTrigger!: any;
   loading1 = true;
@@ -39,15 +45,17 @@ export class DataComponent implements OnInit {
 
   ngOnInit() {
     const sessionData = sessionStorage.getItem('data');
-    console.log(sessionData);
     const sessionDataStatus = sessionStorage.getItem('dataStatus');
     const sessionDevice = sessionStorage.getItem('device');
-    if (sessionData && sessionDataStatus && sessionDevice) {
+    const sessionDeviceType = sessionStorage.getItem('deviceType');
+    if (sessionData && sessionDataStatus && sessionDevice && sessionDeviceType) {
       const jsonData = JSON.parse(sessionData);
       const jsonDataStatus = JSON.parse(sessionDataStatus);
       this.processChartData(jsonData);
       this.createDonutChart(jsonDataStatus.dataStatus);
       this.fetchDeviceInfo(sessionDevice);
+      this.DeviceType = sessionDeviceType;
+      console.log("sessionDeviceType :-",this.DeviceType);
     } else {
       this.getUserDevices();
     }  
@@ -61,7 +69,11 @@ export class DataComponent implements OnInit {
           this.deviceOptions = devices.devices;
           if (this.deviceOptions.length > 0) {
             this.selectedDevice = this.deviceOptions[0].DeviceUID;
+            this.DeviceType = this.deviceOptions[0].DeviceType;
             sessionStorage.setItem('device', this.selectedDevice);
+            sessionStorage.setItem('deviceType', this.DeviceType);
+            console.log("Bydefault DeviceType", this.DeviceType);
+
             this.fetchDefaultData();
             this.fetchDeviceInfo(this.selectedDevice);
           }
@@ -234,6 +246,48 @@ export class DataComponent implements OnInit {
     } as Highcharts.Options);
   }
 
+  createTemperature() {
+    Highcharts.chart('temperatureRYB', {
+      chart: {
+        type: 'spline'
+      },
+      title: {
+        text: ''
+      },
+      credits: {
+            enabled: false // Disable the credits display
+          },
+
+      xAxis: {
+        type: 'datetime',
+        timezoneOffset: 330
+      },
+      yAxis: {
+        title: {
+          text: 'Temperature RYB'
+        },
+        min: 0,
+        max: 100,
+      },
+      series: [{
+        name: 'Temperature R',
+        color: {
+          linearGradient: {
+            x1: 0,
+            x2: 0,
+            y1: 0,
+            y2: 1
+          },
+          stops: [
+            [0, 'rgba(255, 0, 0, 1)'],    // Start color (red)
+            [1, 'rgba(255, 255, 0, 0.3)'] // End color (yellow)
+          ]
+        },
+        data: this.temperatureData
+      }] as any
+    } as Highcharts.Options);
+  }
+
   openFilterDailog(): void{
     const dialogConfig = new MatDialogConfig();
     dialogConfig.width = '500px'; // Set the width of the dialog
@@ -244,28 +298,37 @@ export class DataComponent implements OnInit {
 
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result && result.data && result.dataStatus && result.device) {
+      if (result && result.data && result.dataStatus && result.device && result.deviceType) {
         sessionStorage.setItem('data', JSON.stringify(result.data));
         sessionStorage.setItem('dataStatus', JSON.stringify(result.dataStatus));
         sessionStorage.setItem('device',result.device);
+        sessionStorage.setItem('deviceType', result.deviceType);
+        this.DeviceType = result.deviceType;
+        console.log("Filter Interval Device Type :- ", this.DeviceType);
         this.processChartData(result.data);
         this.createDonutChart(result.dataStatus.dataStatus);
         this.fetchDeviceInfo(result.device);
+        this.router.navigate([this.router.url]);
       } else {
         const sessionData = sessionStorage.getItem('data');
         const sessionDataStatus = sessionStorage.getItem('dataStatus');
         const sessionDevice = sessionStorage.getItem('device');
-        if (sessionData && sessionDataStatus && sessionDevice) {
+        const sessionDeviceType = sessionStorage.getItem('deviceType');
+        if (sessionData && sessionDataStatus && sessionDevice && sessionDeviceType) {
           const jsonData = JSON.parse(sessionData);
           const jsonDataStatus = JSON.parse(sessionDataStatus);
+          this.DeviceType = sessionDeviceType;
+          console.log("Filter Cloose Device Type :- ", this.DeviceType);
           this.processChartData(jsonData);
           this.createDonutChart(jsonDataStatus.dataStatus);
           this.fetchDeviceInfo(sessionDevice);
+          this.router.navigate([this.router.url]);
         } else {
           this.snackBar.open('No session storage data available!', 'Dismiss', {
             duration: 2000
           });
           this.fetchDefaultData();
+          this.router.navigate([this.router.url]);
         }
       }
     });
@@ -276,6 +339,7 @@ export class DataComponent implements OnInit {
       this.DashDataService.dataLast(this.selectedDevice, this.selectedDeviceInterval).subscribe(
         (data: any) => {
           sessionStorage.setItem('data', JSON.stringify(data));
+          sessionStorage.setItem('dataType', this.DeviceType);
           this.processChartData(data);
           this.DashDataService.dataLastStatus(this.selectedDevice, this.selectedDeviceInterval).subscribe(
             (dataStatus: any) => {
@@ -306,6 +370,23 @@ export class DataComponent implements OnInit {
       new Date(entry.TimeStamp).getTime() + istOffset,
       entry.Temperature
     ]);
+
+    this.temperatureRData = data.map((entry: any) => [
+      new Date(entry.TimeStamp).getTime() + istOffset,
+      entry.TemperatureR
+    ]);
+
+    this.temperatureYData = data.map((entry: any) => [
+      new Date(entry.TimeStamp).getTime() + istOffset,
+      entry.TemperatureY
+    ]);
+
+
+    this.temperatureBData = data.map((entry: any) => [
+      new Date(entry.TimeStamp).getTime() + istOffset,
+      entry.TemperatureB
+    ]);
+
     this.humidityData = data.map((entry: any) => [
       new Date(entry.TimeStamp).getTime() + istOffset,
       entry.Humidity
@@ -313,9 +394,23 @@ export class DataComponent implements OnInit {
     this.timestampData = data.map((entry: any) =>
       new Date(entry.TimeStamp).getTime() + istOffset
     );
+    if(this.DeviceType === 'th'){
+      this.createChart();
+      this.createChart2();
+      console.log("processChartData Function", this.temperatureData);
+      console.log("processChartData Function", this.humidityData);
+    } else if(this.DeviceType === 't'){
+      this.createChart();
+      console.log("processChartData Function", this.temperatureData);
+    } else if(this.DeviceType  === 'ryb'){
+      this.createTemperature();
 
-    this.createChart();
-    this.createChart2();
+      console.log("processChartData Function", this.temperatureRData);
+      console.log("processChartData Function", this.temperatureYData);
+      console.log("processChartData Function", this.temperatureBData);
+    } else{
+      console.log("Device Tyopee is  not found!!")
+    }
   }
 
 

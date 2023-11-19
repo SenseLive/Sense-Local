@@ -15,7 +15,8 @@ export class FilterComponent {
 
   CompanyEmail!: string | null;
   selectedDevice!: FormControl;
-   selectedDeviceInterval!: FormControl;
+  selectedDeviceType!: any;
+  selectedDeviceInterval!: FormControl;
   deviceOptions: any[] = [];
   selectedRadioButton: string = 'Last';
   startDate!: Date;
@@ -40,7 +41,7 @@ export class FilterComponent {
     this.selectedDeviceInterval = new FormControl('1hour');
     this.getUserDevices();
 
-    // Set end date as current date
+    // Set end date as the current date
     this.endDate = new Date();
 
     // Set start date as one day before the current date
@@ -48,6 +49,12 @@ export class FilterComponent {
     const currentDate = new Date();
     currentDate.setTime(currentDate.getTime() - oneDay);
     this.startDate = currentDate;
+
+    // Subscribe to changes in selectedDevice and update selectedDeviceType
+    this.selectedDevice.valueChanges.subscribe((newDeviceUID) => {
+      const selectedDevice = this.deviceOptions.find(device => device.DeviceUID === newDeviceUID);
+      this.selectedDeviceType = selectedDevice ? selectedDevice.DeviceType : null;
+    });
   }
 
   downloadPDF() {
@@ -73,7 +80,6 @@ export class FilterComponent {
       });
     }
   }
-  
 
   adjustDialogWidth() {
     const screenWidth = window.innerWidth;
@@ -94,6 +100,7 @@ export class FilterComponent {
           this.deviceOptions = devices.devices;
           if (this.deviceOptions.length > 0) {
             this.selectedDevice.setValue(this.deviceOptions[0].DeviceUID);
+            this.selectedDeviceType = this.deviceOptions[0].DeviceType;
           }
         },
         (error) => {
@@ -114,6 +121,7 @@ export class FilterComponent {
       if (this.selectedDevice.value) {
         const device = this.selectedDevice.value;
         const interval = this.selectedDeviceInterval.value;
+        const deviceType = this.selectedDeviceType;
 
         this.DashDataService.dataLast(device, interval).subscribe(
           (resultData: any) => {
@@ -121,7 +129,7 @@ export class FilterComponent {
             this.DashDataService.dataLastStatus(device, interval).subscribe(
               (resultDataStatus: any) => {
                 const dataStatus = resultDataStatus;
-                this.dialogRef.close({ data, dataStatus, device });
+                this.dialogRef.close({ data, dataStatus, device, deviceType });
               },
               (error) => {
                 this.snackBar.open('Error while fetching last data status!', 'Dismiss', {
@@ -146,6 +154,7 @@ export class FilterComponent {
         const device = this.selectedDevice.value;
         const formattedStartDate = this.startDate.toISOString().split('T')[0];
         const formattedEndDate = this.endDate.toISOString().split('T')[0];
+        const deviceType = this.selectedDeviceType;
 
         this.DashDataService.DataByCustomDate(device, formattedStartDate, formattedEndDate).subscribe(
           (resultData: any) => {
@@ -153,7 +162,7 @@ export class FilterComponent {
             this.DashDataService.DataByCustomDateStatus(device, formattedStartDate, formattedEndDate).subscribe(
               (resultDataStatus: any) => {
                 const dataStatus = resultDataStatus;
-                this.dialogRef.close({ data, dataStatus, device });
+                this.dialogRef.close({ data, dataStatus, device, deviceType });
               },
               (error) => {
                 this.snackBar.open('Error while fetching data status by custom date!', 'Dismiss', {

@@ -9,7 +9,14 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
 
+.data-charts-2{
+	height: 77vh;
+	width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .panel-title {
@@ -98,6 +105,14 @@
 
 .chart-container {
   height: 35vh; /* Adjust the height of the chart container as needed */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.chart-container-2 {
+  height: 77vh; /* Adjust the height of the chart container as needed */
   display: flex;
   align-items: center;
   justify-content: center;

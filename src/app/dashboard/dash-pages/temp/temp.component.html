@@ -18,7 +18,7 @@
                   </div>
                 </div>
               </div>
-              <div class="row">
+              <div class="row" *ngIf="device.DeviceType === 'th'">
                 <div class="col-6 d-flex">
                   <img src="../../../../assets/img/tm.gif" class="card-img">
                   <div class="image-text"> {{ deviceData[getIndex(device.DeviceUID)]?.Temperature }} &deg;C</div>
@@ -26,6 +26,26 @@
                 <div class="col-6 d-flex">
                   <img src="../../../../assets/img/hm.gif" class="card-img">
                   <div class="image-text">{{ deviceData[getIndex(device.DeviceUID)]?.Humidity }}%</div>
+                </div>
+              </div>
+              <div class="row" *ngIf="device.DeviceType === 'ryb'">
+                <div class="col-4 d-flex">
+                  <img src="../../../../assets/img/tm.gif" class="card-img-ryb">
+                  <div class="image-text-ryb"> {{ deviceData[getIndex(device.DeviceUID)]?.TemperatureR }} &deg;C</div>
+                </div>
+                <div class="col-4 d-flex">
+                  <img src="../../../../assets/img/tm.gif" class="card-img-ryb">
+                  <div class="image-text-ryb">{{ deviceData[getIndex(device.DeviceUID)]?.TemperatureY }} &deg;C</div>
+                </div>
+                <div class="col-4 d-flex">
+                  <img src="../../../../assets/img/tm.gif" class="card-img-ryb">
+                  <div class="image-text-ryb">{{ deviceData[getIndex(device.DeviceUID)]?.TemperatureB }} &deg;C</div>
+                </div>
+              </div>
+              <div class="row" *ngIf="device.DeviceType === 't'">
+                <div class="col-12 d-flex">
+                  <img src="../../../../assets/img/tm.gif" class="card-img">
+                  <div class="image-text"> {{ deviceData[getIndex(device.DeviceUID)]?.Temperature }} &deg;C</div>
                 </div>
               </div>
             </mat-card-content>

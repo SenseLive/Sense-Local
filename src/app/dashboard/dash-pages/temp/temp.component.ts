@@ -97,7 +97,9 @@ export class TempComponent implements OnInit, OnDestroy {
     dialogConfig.maxWidth = '90vw';
     dialogConfig.data = { device };
     const dialogRef = this.dialog.open(TriggerDeviceComponent, dialogConfig);
-    dialogRef.afterClosed().subscribe(updatedDevice => {});
+    dialogRef.afterClosed().subscribe(updatedDevice => {
+      this.getUserDevicesTrigger();
+    });
   }
 
   subscribeToTopics() {

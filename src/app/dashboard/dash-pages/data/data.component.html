@@ -33,18 +33,6 @@
 				  </mat-card-content>
 				</div>
 			</mat-card>
-
-		</div>
-		<div class="col-lg-8 col-md-8 col-sm-12 mb-2">
-			<mat-card class="data-charts">
-			  <mat-card-content>
-			  	<div id="curvedLineChart" class="chart-container"></div>
-			  </mat-card-content>
-			</mat-card>
-		</div>
-	</div>
-	<div class="row mb-2">
-		<div class="col-lg-4 col-md-4 col-sm-12 mb-2">
 			<mat-card class='mb-2 data-charts'>
 			  <mat-card-content>
 			  	<div id="donutChart" class="chart-container"></div>
@@ -52,11 +40,35 @@
 			</mat-card>
 		</div>
 		<div class="col-lg-8 col-md-8 col-sm-12 mb-2">
-			<mat-card class="data-charts">
-			  <mat-card-content>
-			  	<div id="curvedLineChart2" class="chart-container"></div>
-			  </mat-card-content>
-			</mat-card>
+			<div *ngIf="DeviceType === 'th'">
+				<mat-card class="mb-2 data-charts">
+				  <mat-card-content>
+				  	<div id="curvedLineChart" class="chart-container"></div>
+				  </mat-card-content>
+				</mat-card>
+				<mat-card class="mb-2 data-charts">
+				  <mat-card-content>
+				  	<div id="curvedLineChart2" class="chart-container"></div>
+				  </mat-card-content>
+				</mat-card>
+			</div>
+
+			<div *ngIf="DeviceType === 't'">
+				<mat-card class="mb-2 data-charts-2">
+				  <mat-card-content>
+				  	<div id="curvedLineChart" class="chart-container-2"></div>
+				  </mat-card-content>
+				</mat-card>
+			</div>
+
+			<div *ngIf="DeviceType === 'ryb'">
+				<mat-card class="mb-2 data-charts-2">
+				  <mat-card-content>
+				  	<div id="temperatureRYB" class="chart-container-2"></div>
+				  </mat-card-content>
+				</mat-card>
+			</div>
+			
 		</div>
 	</div>
 </section>
