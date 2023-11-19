@@ -18,7 +18,7 @@ import{ DashService } from '../../dash.service';
 export class UserManageComponent implements OnInit, OnDestroy {
   CompanyEmail!: string | null;
   displayedColumns: string[] = ['Name', 'Contact', 'Designation', 'Status'];
-  displayedColumns2: string[] = ['DeviceName', 'Location', 'IssueDate', 'Status'];
+  displayedColumns2: string[] = ['DeviceName', 'Location', 'IssueDate', 'Status','DeviceType'];
   dataSource: UserData[] = [];
   dataSource2: DeviceData[] = [];
   totalUsers: number = 0;

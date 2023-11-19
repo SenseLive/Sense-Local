@@ -40,3 +40,9 @@
 	position: relative;
 	z-index: -1;
 }
+td{
+  text-align: center;
+}
+th{
+  text-align: center;
+}
