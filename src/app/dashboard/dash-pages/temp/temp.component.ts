@@ -149,10 +149,10 @@ export class TempComponent implements OnInit, OnDestroy {
     const deviceTrigger = this.deviceData[this.getIndex(deviceUid)];
     if (deviceTrigger) {
       const trigger = this.userDevicesTrigger.find(trigger => trigger.DeviceUID === deviceUid);
-      if (trigger && deviceTrigger.Temperature) {
+      if (trigger && deviceTrigger.TemperatureR) {
         const triggerValue = trigger.TriggerValue;
-        const temperature = deviceTrigger.Temperature;
-        const isHeated = temperature > triggerValue;     
+        const temperature = deviceTrigger.TemperatureR;
+        const isHeated = temperature < triggerValue;     
         return isHeated;
       }
     }
@@ -160,7 +160,3 @@ export class TempComponent implements OnInit, OnDestroy {
   }
 
 }
-
-
-
-

@@ -19,14 +19,14 @@
 		        <mat-error *ngIf="TriggerValue.invalid">{{getThresholdErrorMessage()}}</mat-error>
 		      </mat-form-field>
     	</div>
-    	<div class="col-md-12 mb-2">
+    	<div class="col-md-6 mb-2">
     		<mat-form-field class="from-field">
 		        <mat-label>Device Unique Id</mat-label>
 		        <input matInput [formControl]="DeviceUID" required>
 		        <mat-error *ngIf="DeviceName.invalid">Device Unique ID is Required.</mat-error>
 		     </mat-form-field>
     	</div>
-    	<div class="col-md-12 mb-2">
+    	<div class="col-md-6 mb-2">
 	    	<mat-form-field class="from-field">
 			    <mat-label>Device Location</mat-label>
 			    <input matInput [formControl]="DeviceLocation" required>

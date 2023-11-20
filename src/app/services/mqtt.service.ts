@@ -1,52 +1,38 @@
 import { Injectable } from '@angular/core';
-import { MqttService, IMqttMessage } from 'ngx-mqtt';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import * as mqtt from 'mqtt';
 
 @Injectable({
   providedIn: 'root'
 })
 export class MqttService {
-  public mqttClient!: MqttService;
+  private client: mqtt.Client;
 
-  private brokerUrl = 'broker.emqx.io';
-  private port = 8083;
-  private username = 'your-username';
-  private password = 'your-password';
-  private clientId = `mqtt-client-${Math.random().toString(16).substr(2, 8)}`;
+  constructor() {
+    // Replace the following options with your MQTT broker details
+    const options: mqtt.IClientOptions = {
+      host: '13.232.24.140',
+      port: 1883,
+      protocol: 'mqtt',
+      username: 'Sense2023',
+      password: 'sense123'
+    };
 
-  constructor(private mqttService: MqttService,public snackBar: MatSnackBar) { }
+    this.client = mqtt.connect(options);
 
-  connect(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      this.mqttClient = this.mqttService.connect({
-        hostname: this.brokerUrl,
-        port: this.port,
-        /*username: this.username,
-        password: this.password,*/
-        clientId: this.clientId,
-        protocol: 'ws'
-      });
+    this.client.on('connect', () => {
+      console.log('Connected to MQTT broker');
+      // You can subscribe to topics or perform other actions here
+    });
 
-      this.mqttClient.onConnect.subscribe(() => {
-        this.snackBar.open('Connected to MQTT broker!', 'Dismiss', {
-          duration: 2000
-        });
-        resolve();
-      });
-
-      this.mqttClient.onError.subscribe((error: any) => {
-        console.error('MQTT error:', error);
-        reject(error);
-      });
+    this.client.on('error', (error) => {
+      console.error('Error connecting to MQTT broker:', error);
     });
   }
 
-  disconnect(): void {
-    if (this.mqttClient) {
-      this.mqttClient.disconnect();
-      this.snackBar.open('Disconnected from MQTT broker!', 'Dismiss', {
-        duration: 2000
-      });
-    }
+  // Add your MQTT-related methods here
+
+  ngOnDestroy() {
+    // Disconnect from the MQTT broker when the component or service is destroyed
+    this.client.end();
   }
 }

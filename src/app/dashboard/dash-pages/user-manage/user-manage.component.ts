@@ -106,7 +106,7 @@ export class UserManageComponent implements OnInit, OnDestroy {
           });          
 
           this.totalDevices = this.dataSource2.length;
-          this.totalActiveDevices = this.dataSource2.filter(devices => devices.status === "online").length;
+          this.totalActiveDevices = this.dataSource2.filter(devices => devices.status === "online" || devices.status === "heating").length;
           this.totalInactiveDevices = this.dataSource2.filter(devices => devices.status === "offline" ).length;
           this.dashService.isPageLoading(false);
         },
