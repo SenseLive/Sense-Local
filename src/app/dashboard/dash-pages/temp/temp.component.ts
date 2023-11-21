@@ -30,10 +30,9 @@ export class TempComponent implements OnInit, OnDestroy {
     public snackBar: MatSnackBar,
   ) {
     const connectionSubscription: Subscription = this.mqttService.state.subscribe((state: MqttConnectionState) => {
-    console.log('MQTT Connection Status:', state);
     if (state === MqttConnectionState.CONNECTED) {
-      // Connection has been established
-      console.log('MQTT Connection Established!');
+      // // Connection has been established
+      // console.log('MQTT Connection Established!');
     }
   });
   }
@@ -120,7 +119,6 @@ export class TempComponent implements OnInit, OnDestroy {
 
 
         deviceData.Timestamp = new Date();
-        console.log(deviceData);
 
         const index = this.userDevices.findIndex(d => d.DeviceUID === device.DeviceUID);
         if (index !== -1) {
