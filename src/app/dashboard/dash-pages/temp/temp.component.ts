@@ -5,7 +5,7 @@ import { TriggerDeviceComponent } from '../../dash-component/trigger-device/trig
 import { DashDataService } from '../../dash-data-service/dash-data.service';
 import { AuthService } from '../../../login/auth/auth.service';
 import { Subscription } from 'rxjs';
-import { MqttService, IMqttMessage } from 'ngx-mqtt';
+import { MqttService, IMqttMessage, MqttConnectionState  } from 'ngx-mqtt';
 import{ DashService } from '../../dash.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -28,7 +28,15 @@ export class TempComponent implements OnInit, OnDestroy {
     private mqttService: MqttService,
     public dashService: DashService,
     public snackBar: MatSnackBar,
-  ) {}
+  ) {
+    const connectionSubscription: Subscription = this.mqttService.state.subscribe((state: MqttConnectionState) => {
+    console.log('MQTT Connection Status:', state);
+    if (state === MqttConnectionState.CONNECTED) {
+      // Connection has been established
+      console.log('MQTT Connection Established!');
+    }
+  });
+  }
 
 
 
@@ -105,10 +113,14 @@ export class TempComponent implements OnInit, OnDestroy {
   subscribeToTopics() {
     this.deviceData = [];
     this.userDevices.forEach(device => {
-      const topic = `sense/live/${device.DeviceUID}`;
+      const topic = `Sense/Live/${device.DeviceUID}`;
       const subscription = this.mqttService.observe(topic).subscribe((message: IMqttMessage) => {
         const payload = message.payload.toString();
         const deviceData = JSON.parse(payload);
+
+
+        deviceData.Timestamp = new Date();
+        console.log(deviceData);
 
         const index = this.userDevices.findIndex(d => d.DeviceUID === device.DeviceUID);
         if (index !== -1) {
@@ -145,18 +157,61 @@ export class TempComponent implements OnInit, OnDestroy {
     return false; // Device data not available, consider it disconnected
   }
 
+  // isDeviceHeated(deviceUid: string): boolean {
+  //   const deviceTrigger = this.deviceData[this.getIndex(deviceUid)];
+  //   if (deviceTrigger) {
+  //     const trigger = this.userDevicesTrigger.find(trigger => trigger.DeviceUID === deviceUid);
+  //     if (trigger && deviceTrigger.TemperatureR) {
+  //       const triggerValue = trigger.TriggerValue;
+  //       const temperature = deviceTrigger.TemperatureR;
+  //       const isHeated = temperature < triggerValue;     
+  //       return isHeated;
+  //     }
+  //   }
+  //   return false; // Device or trigger not found, or missing temperature value
+  // }
+
   isDeviceHeated(deviceUid: string): boolean {
-    const deviceTrigger = this.deviceData[this.getIndex(deviceUid)];
-    if (deviceTrigger) {
-      const trigger = this.userDevicesTrigger.find(trigger => trigger.DeviceUID === deviceUid);
-      if (trigger && deviceTrigger.TemperatureR) {
+  const deviceIndex = this.getIndex(deviceUid);
+  const deviceTrigger = this.deviceData[deviceIndex];
+
+  if (deviceTrigger) {
+    const trigger = this.userDevicesTrigger.find(trigger => trigger.DeviceUID === deviceUid);
+
+    if (trigger) {
+      let temperature; // Variable to hold the temperature value
+
+      // Check if individual temperature parameters (R, Y, B) are available
+      if ('TemperatureR' in deviceTrigger && 'TemperatureY' in deviceTrigger && 'TemperatureB' in deviceTrigger) {
+        temperature = {
+          R: deviceTrigger.TemperatureR,
+          Y: deviceTrigger.TemperatureY,
+          B: deviceTrigger.TemperatureB,
+        };
+      } else if ('Temperature' in deviceTrigger) {
+        // Check if a single "Temperature" value is available
+        temperature = deviceTrigger.Temperature;
+      }
+
+      // Ensure that temperature data is available
+      if (temperature !== undefined) {
         const triggerValue = trigger.TriggerValue;
-        const temperature = deviceTrigger.TemperatureR;
-        const isHeated = temperature < triggerValue;     
-        return isHeated;
+
+        // Check the temperature and compare with the trigger value
+        if (typeof temperature === 'number' && temperature >triggerValue) {
+          return true; // Device is heated
+        } else if (typeof temperature === 'object') {
+          // Check individual temperature parameters
+          if (temperature.R > triggerValue || temperature.Y > triggerValue || temperature.B > triggerValue) {
+            return true; // Device is heated
+          }
+        }
       }
     }
-    return false; // Device or trigger not found, or missing temperature value
   }
+
+  return false; // Device or trigger not found, or missing temperature value
+}
+
 
 }

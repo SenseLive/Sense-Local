@@ -16,6 +16,7 @@ export class LoginComponent {
   errorMessage = '';
   loading: boolean = false;
   loadingMessage: string = "Sign In";
+  UserId!: string;
 
   constructor(
     private authService: AuthService,
@@ -57,10 +58,17 @@ export class LoginComponent {
           const checkUserType = () => {
             const userType = this.authService.getUserType();
             if (userType) {
-              this.redirectUser(userType);
-              this.snackBar.open('Login successful!', 'Dismiss', {
-                duration: 2000
-              });
+              this.UserId = sessionStorage.getItem('UserId') ?? '';
+              this.authService.setUserOnline(this.UserId).subscribe(
+                () =>{
+                  this.redirectUser(userType);
+                  this.snackBar.open('Login successful!', 'Dismiss', {
+                    duration: 2000
+                  });
+                },
+                (error) =>{
+                }
+              );
             } else {
               setTimeout(checkUserType, 100);
             }

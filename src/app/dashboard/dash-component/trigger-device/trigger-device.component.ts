@@ -14,7 +14,7 @@ export class TriggerDeviceComponent {
   device: any;
   deviceId!: string;
   CompanyEmail!:string | null;
-  TriggerValue = new FormControl('', [Validators.required, Validators.pattern(/^\d*\.?\d+$/), Validators.min(0), Validators.max(100)]);
+  TriggerValue = new FormControl('', [Validators.required, Validators.pattern(/^\d*\.?\d+$/), Validators.min(0), Validators.max(200)]);
 
   @HostListener('window:resize')
   onWindowResize() {
@@ -86,7 +86,7 @@ export class TriggerDeviceComponent {
     }
     
     if (this.TriggerValue.hasError('max')) {
-      return 'Not more than 100';
+      return 'Not more than 200';
     }
     
     return '';

@@ -11,6 +11,8 @@ import { Router } from '@angular/router';
 })
 export class NavbarComponent {
 
+  UserId!: string;
+
   constructor(public dashService: DashService, public authService:  AuthService, private router: Router) { }
 
   public toggleMenu() {
@@ -22,7 +24,14 @@ export class NavbarComponent {
   }
 
   logout(){
-    this.authService.logout();
+    this.UserId = sessionStorage.getItem('UserId') ?? '';
+    this.authService.setUserOffline(this.UserId).subscribe(
+      () =>{
+        this.authService.logout();
+      },
+      (error) =>{
+      }
+    );
   }
 
   home(){

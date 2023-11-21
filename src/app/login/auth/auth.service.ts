@@ -124,4 +124,13 @@ export class AuthService {
   getAllUsers(): Observable<any> {
     return this.http.get<any>(`${this.API_URL}/users`);
   }
+
+  setUserOffline(UserId: string): Observable<any> {
+    return this.http.put(`${this.API_URL}/setUserOffline/${UserId}`, {});
+  }
+  
+  setUserOnline(UserId: string): Observable<any> {
+    return this.http.put(`${this.API_URL}/setUserOnline/${UserId}`, {});
+  }
+
 }
