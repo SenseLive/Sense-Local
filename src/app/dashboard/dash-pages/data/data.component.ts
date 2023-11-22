@@ -265,9 +265,8 @@ export class DataComponent implements OnInit {
         text: ''
       },
       credits: {
-            enabled: false // Disable the credits display
-          },
-
+        enabled: false 
+      },
       xAxis: {
         type: 'datetime',
         timezoneOffset: 330
@@ -279,40 +278,48 @@ export class DataComponent implements OnInit {
         min: 0,
         max: 100,
       },
-      series: [{
-        name: 'Temperature R',
-        color: {
-          linearGradient: {
-            x1: 0,
-            x2: 0,
-            y1: 0,
-            y2: 1
+      series: [
+        {
+          name: 'Temperature R',
+          color: {
+            linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+            stops: [
+              [0, 'rgba(255, 0, 0, 1)'],    // Start color (red)
+              [1, 'rgba(255, 255, 0, 0.3)'] // End color (yellow)
+            ]
           },
-          stops: [
-            [0, 'rgba(255, 0, 0, 1)'],    // Start color (red)
-            [1, 'rgba(255, 255, 0, 0.3)'] // End color (yellow)
-          ]
+          data: this.temperatureRData,
+          lineWidth: 3 // Set the line width to triple
         },
-        data: this.temperatureData
-      },
-      {
-        name: 'Humitidy',
-        color: {
-          linearGradient: {
-            x1: 0,
-            x2: 0,
-            y1: 0,
-            y2: 1
+        {
+          name: 'Temperature B',
+          color: {
+            linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+            stops: [
+              [0, 'rgba(0, 0, 255, 1)'],    // Start color (blue)
+              [1, 'rgba(0, 255, 255, 0.3)'] // End color (cyan)
+            ]
           },
-          stops: [
-            [0, 'rgba(0, 0, 255, 1)'],    // Start color (blue)
-            [1, 'rgba(0, 255, 255, 0.3)'] // End color (cyan)
-          ]
+          data: this.temperatureBData,
+          lineWidth: 3 // Set the line width to triple
         },
-        data: this.humidityData
-      }] as any
+        {
+          name: 'Temperature Y',
+          color: {
+            linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
+            stops: [
+              [0, 'rgba(255, 255, 0, 0.3)'],    // Start color (yellow)
+              [1, 'rgba(255, 0, 0, 1)'] // End color (red)
+            ]
+          },
+          data: this.temperatureYData,
+          lineWidth: 3 // Set the line width to triple
+        },
+      ] as any
     } as Highcharts.Options);
   }
+  
+  
 
   openFilterDailog(): void {
     const dialogConfig = new MatDialogConfig();
@@ -397,8 +404,51 @@ export class DataComponent implements OnInit {
     }
   }
 
+  // processChartData(response: any) {
+  //   const data = response.data; 
+  //   const istOffset = 5.5 * 60 * 60 * 1000; 
+
+
+
+  //   this.temperatureYData = data.map((entry: any) => [
+  //     new Date(entry.TimeStamp).getTime() + istOffset,
+  //     entry.TemperatureY
+  //   ]);
+
+
+  //   this.temperatureBData = data.map((entry: any) => [
+  //     new Date(entry.TimeStamp).getTime() + istOffset,
+  //     entry.TemperatureB
+  //   ]);
+
+  //   this.humidityData = data.map((entry: any) => [
+  //     new Date(entry.TimeStamp).getTime() + istOffset,
+  //     entry.Humidity
+  //   ]);
+  //   this.timestampData = data.map((entry: any) =>
+  //     new Date(entry.TimeStamp).getTime() + istOffset
+  //   );
+  //   if(this.DeviceType === 'th'){
+  //     this.createChart();
+  //     this.createChart2();
+  //     console.log("processChartData Function", this.temperatureData);
+  //     console.log("processChartData Function", this.humidityData);
+  //   } else if(this.DeviceType === 't'){
+  //     this.createChart();
+  //     console.log("processChartData Function", this.temperatureData);
+  //   } else if(this.DeviceType  === 'ryb'){
+  //     this.createTemperature();
+
+  //     console.log("temperatureRData", this.temperatureRData);
+  //     console.log("temperatureYData", this.temperatureYData);
+  //     console.log("temperatureBData", this.temperatureBData);
+  //   } else{
+  //     console.log("Device Tyopee is  not found!!")
+  //   }
+  // }
+
   processChartData(response: any) {
-    const data = response.data; // Access the 'data' property of the response object
+    const data = response.data;
     const istOffset = 5.5 * 60 * 60 * 1000; // IST offset: +5:30 in milliseconds
 
     this.temperatureData = data.map((entry: any) => [
@@ -406,47 +456,43 @@ export class DataComponent implements OnInit {
       entry.Temperature
     ]);
 
+    this.humidityData = data.map((entry: any) => [
+          new Date(entry.TimeStamp).getTime() + istOffset,
+          entry.Humidity
+        ]);
+
+    // Convert TemperatureR, TemperatureY, and TemperatureB values to numbers
     this.temperatureRData = data.map((entry: any) => [
       new Date(entry.TimeStamp).getTime() + istOffset,
-      entry.TemperatureR
+      parseFloat(entry.TemperatureR)
     ]);
-
+  
     this.temperatureYData = data.map((entry: any) => [
       new Date(entry.TimeStamp).getTime() + istOffset,
-      entry.TemperatureY
+      parseFloat(entry.TemperatureY)
     ]);
-
-
+  
     this.temperatureBData = data.map((entry: any) => [
       new Date(entry.TimeStamp).getTime() + istOffset,
-      entry.TemperatureB
+      parseFloat(entry.TemperatureB)
     ]);
-
-    this.humidityData = data.map((entry: any) => [
-      new Date(entry.TimeStamp).getTime() + istOffset,
-      entry.Humidity
-    ]);
+  
     this.timestampData = data.map((entry: any) =>
       new Date(entry.TimeStamp).getTime() + istOffset
     );
-    if(this.DeviceType === 'th'){
+  
+    if (this.DeviceType === 'th') {
       this.createChart();
       this.createChart2();
-      console.log("processChartData Function", this.temperatureData);
-      console.log("processChartData Function", this.humidityData);
-    } else if(this.DeviceType === 't'){
+    } else if (this.DeviceType === 't') {
       this.createChart();
-      console.log("processChartData Function", this.temperatureData);
-    } else if(this.DeviceType  === 'ryb'){
+    } else if (this.DeviceType === 'ryb') {
       this.createTemperature();
-
-      console.log("processChartData Function", this.temperatureRData);
-      console.log("processChartData Function", this.temperatureYData);
-      console.log("processChartData Function", this.temperatureBData);
-    } else{
-      console.log("Device Tyopee is  not found!!")
+    } else {
+      console.log("Device Type is not found!");
     }
   }
+  
 
 
   fetchDeviceInfo(deviceId: string) {
