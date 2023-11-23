@@ -25,7 +25,9 @@
 						       'offline': DeviceStatus === 'offline',
 						       'heating': DeviceStatus === 'heating'
 						     }">
-						{{ DeviceStatus }}
+						<div *ngIf="DeviceStatus === 'online'">Online</div>
+						<div *ngIf="DeviceStatus === 'offline'">Offline</div>
+						<div *ngIf="DeviceStatus === 'heating'">Heating</div>
 						</div>
 				    <div class="panel-device-time">
 				      Last Updated: <span>{{ DeviceLastUpdatedTime }}</span>
