@@ -49,6 +49,22 @@
                   <div class="image-text"> {{ deviceData[getIndex(device.DeviceUID)]?.Temperature }} &deg;C</div>
                 </div>
               </div>
+              <div class="row" *ngIf="device.DeviceType === 'ws'">
+                <div class="col-4 d-flex">
+                  <img src="../../../../assets/img/ws1.png" class="card-img-ryb">
+                  <div class="image-text-ws-3">{{ (deviceData[getIndex(device.DeviceUID)]?.flowRate || 00).toFixed(2) }} 
+                    <div class="image-text-ws-3">ml/s</div>
+                  </div>
+                </div>
+                <div class="col-4">
+                  <div class="image-text-ws">5000L</div>
+                  <div class="image-text-ws-2"><span class="trend-arrow">▲ 20% </span>Today</div>
+                </div>
+                <div class="col-4">
+                  <div class="image-text-ws">5000KL</div>
+                  <div class="image-text-ws-2"><span class="trend-arrow">▲ 20% </span>This Month</div>
+                </div>
+              </div>
             </mat-card-content>
           </mat-card>
           <div class="type-text" *ngIf="device.DeviceType === 'ryb'">RYB</div>

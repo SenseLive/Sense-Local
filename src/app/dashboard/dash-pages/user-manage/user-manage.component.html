@@ -149,12 +149,31 @@
                     <td mat-cell *matCellDef="let element" [ngClass]="{'online': element.Status === 'Online', 'offline': element.Status === 'Offline'}">{{ element.Status }}</td>
                   </ng-container>
 
+                  <!-- <ng-container matColumnDef="DeviceType">
+                    <th mat-header-cell *matHeaderCellDef>Device Type</th>
+                    <td mat-cell *matCellDef="let element">
+                      {{ element.DeviceType === 'ryb' ? 'RYB' : (element.DeviceType === 'th' ? 'TH' : 'Temperature') }}
+                    </td>
+                  </ng-container> -->
                   <ng-container matColumnDef="DeviceType">
-                      <th mat-header-cell *matHeaderCellDef>Device Type</th>
-                      <td mat-cell *matCellDef="let element">
-                        {{ element.DeviceType === 'ryb' ? 'RYB' : (element.DeviceType === 'th' ? 'TH' : 'Temperature') }}
-                      </td>
-                    </ng-container>
+                    <th mat-header-cell *matHeaderCellDef>Device Type</th>
+                    <td mat-cell *matCellDef="let element">
+                      {{
+                          element.DeviceType === 'ryb'
+                          ? 'RYB'
+                          : element.DeviceType === 'th'
+                          ? 'TH'
+                          : element.DeviceType === 'ws'
+                          ? 'Water Sensor'
+                          : element.DeviceType === 'fs'
+                          ? 'Flow Sensor'
+                          : element.DeviceType === 't'
+                          ? 'Temprature'
+                          : "Unknown"
+                      }}
+                    </td>
+                  </ng-container>
+
 
 
                   <!-- Render the table header row -->

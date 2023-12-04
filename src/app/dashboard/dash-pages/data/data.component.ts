@@ -34,7 +34,9 @@ export class DataComponent implements OnInit {
   temperatureYData: any[] = [];
   temperatureBData: any[] = [];
   humidityData: any[] = [];
+  flowRateData: any[] = [];
   timestampData: any[] = [];
+  consuptionData: any[] = [];
   DeviceName!: any;
   DeviceStatus!: any;
   DeviceType!: any;
@@ -68,6 +70,14 @@ export class DataComponent implements OnInit {
   };
 
   loadData();
+  this.consuptionData = [
+    { category: 'Category 1', value: 30 },
+    { category: 'Category 2', value: 60 },
+    { category: 'Category 3', value: 80 },
+    { category: 'Category 1', value: 30 },
+    { category: 'Category 2', value: 60 },
+    { category: 'Category 3', value: 80 }
+  ];
 }
 
 
@@ -194,9 +204,7 @@ export class DataComponent implements OnInit {
       yAxis: {
         title: {
           text: 'Temperature'
-        },
-        min: 0,
-        max: 100,
+        }
       },
       series: [{
         name: 'Temperature',
@@ -235,9 +243,7 @@ export class DataComponent implements OnInit {
       yAxis: {
         title: {
           text: 'Humidity'
-        },
-        min: 0,
-        max: 100,
+        }
       },
       series: [{
         name: 'Humitidy',
@@ -254,6 +260,46 @@ export class DataComponent implements OnInit {
           ]
         },
         data: this.humidityData
+      }] as any
+    } as Highcharts.Options);
+  }
+
+  createChart3() {
+    Highcharts.chart('curvedLineChart3', {
+      chart: {
+        type: 'spline'
+      },
+      title: {
+        text: ''
+      },
+      credits: {
+            enabled: false // Disable the credits display
+          },
+
+      xAxis: {
+        type: 'datetime',
+        timezoneOffset: 330
+      },
+      yAxis: {
+        title: {
+          text: 'Flow Rate'
+        }
+      },
+      series: [{
+        name: 'Flow Rate',
+        color: {
+          linearGradient: {
+            x1: 0,
+            x2: 0,
+            y1: 0,
+            y2: 1
+          },
+          stops: [
+            [0, 'rgba(0, 0, 255, 1)'],    // Start color (blue)
+            [1, 'rgba(0, 255, 255, 0.3)'] // End color (yellow)
+          ]
+        },
+        data: this.flowRateData
       }] as any
     } as Highcharts.Options);
   }
@@ -277,8 +323,8 @@ export class DataComponent implements OnInit {
         title: {
           text: 'Temperature RYB'
         },
-        min: 0,
-        max: 100,
+        // min: 0,
+        // max: 100,
       },
       series: [
         {
@@ -320,6 +366,48 @@ export class DataComponent implements OnInit {
       ] as any
     } as Highcharts.Options);
   }
+
+  createBarGraph() {
+    Highcharts.chart('barChart', {
+      chart: {
+        type: 'column'  // Specify the chart type as 'bar'
+      },
+      title: {
+        text: ''
+      },
+      credits: {
+        enabled: false // Disable the credits display
+      },
+      xAxis: {
+        categories: this.consuptionData.map(dataPoint => dataPoint.category), // Specify categories for each bar
+        title: {
+          text: 'Categories'
+        }
+      },
+      yAxis: {
+        title: {
+          text: 'Temperature'
+        }
+      },
+      series: [{
+        name: 'Temperature',
+        color: {
+          linearGradient: {
+            x1: 0,
+            x2: 0,
+            y1: 0,
+            y2: 1
+          },
+          stops: [
+            [0, 'rgba(255, 0, 0, 1)'],    // Start color (red)
+            [1, 'rgba(255, 255, 0, 0.3)'] // End color (yellow)
+          ]
+        },
+        data: this.consuptionData.map(dataPoint => dataPoint.value) // Specify the temperature values for each category
+      }] as any
+    } as Highcharts.Options);
+  }
+
   
   
 
@@ -406,49 +494,6 @@ export class DataComponent implements OnInit {
     }
   }
 
-  // processChartData(response: any) {
-  //   const data = response.data; 
-  //   const istOffset = 5.5 * 60 * 60 * 1000; 
-
-
-
-  //   this.temperatureYData = data.map((entry: any) => [
-  //     new Date(entry.TimeStamp).getTime() + istOffset,
-  //     entry.TemperatureY
-  //   ]);
-
-
-  //   this.temperatureBData = data.map((entry: any) => [
-  //     new Date(entry.TimeStamp).getTime() + istOffset,
-  //     entry.TemperatureB
-  //   ]);
-
-  //   this.humidityData = data.map((entry: any) => [
-  //     new Date(entry.TimeStamp).getTime() + istOffset,
-  //     entry.Humidity
-  //   ]);
-  //   this.timestampData = data.map((entry: any) =>
-  //     new Date(entry.TimeStamp).getTime() + istOffset
-  //   );
-  //   if(this.DeviceType === 'th'){
-  //     this.createChart();
-  //     this.createChart2();
-  //     console.log("processChartData Function", this.temperatureData);
-  //     console.log("processChartData Function", this.humidityData);
-  //   } else if(this.DeviceType === 't'){
-  //     this.createChart();
-  //     console.log("processChartData Function", this.temperatureData);
-  //   } else if(this.DeviceType  === 'ryb'){
-  //     this.createTemperature();
-
-  //     console.log("temperatureRData", this.temperatureRData);
-  //     console.log("temperatureYData", this.temperatureYData);
-  //     console.log("temperatureBData", this.temperatureBData);
-  //   } else{
-  //     console.log("Device Tyopee is  not found!!")
-  //   }
-  // }
-
   processChartData(response: any) {
     const data = response.data;
     const istOffset = 5.5 * 60 * 60 * 1000; // IST offset: +5:30 in milliseconds
@@ -459,9 +504,9 @@ export class DataComponent implements OnInit {
     ]);
 
     this.humidityData = data.map((entry: any) => [
-          new Date(entry.TimeStamp).getTime() + istOffset,
-          entry.Humidity
-        ]);
+      new Date(entry.TimeStamp).getTime() + istOffset,
+      entry.Humidity
+    ]);
 
     // Convert TemperatureR, TemperatureY, and TemperatureB values to numbers
     this.temperatureRData = data.map((entry: any) => [
@@ -482,6 +527,11 @@ export class DataComponent implements OnInit {
     this.timestampData = data.map((entry: any) =>
       new Date(entry.TimeStamp).getTime() + istOffset
     );
+
+    this.flowRateData = data.map((entry: any) => [
+      new Date(entry.TimeStamp).getTime() + istOffset,
+      entry.flowRate
+    ]);
   
     if (this.DeviceType === 'th') {
       this.createChart();
@@ -490,7 +540,10 @@ export class DataComponent implements OnInit {
       this.createChart();
     } else if (this.DeviceType === 'ryb') {
       this.createTemperature();
-    } else {
+    } else if (this.DeviceType === 'ws'){
+      this.createChart3();
+      this.createBarGraph();
+    } else{
       console.log("Device Type is not found!");
     }
   }

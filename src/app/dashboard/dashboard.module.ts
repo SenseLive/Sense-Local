@@ -35,6 +35,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 import {MatChipsModule} from '@angular/material/chips';
 
@@ -93,7 +94,8 @@ import { PageLoadingComponent } from './dash-loading/page-loading/page-loading.c
     MatTabsModule,
     MatChipsModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatTooltipModule
   ],
   providers:[
     AuthService,
