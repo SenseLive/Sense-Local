@@ -20,6 +20,7 @@ export class TempComponent implements OnInit, OnDestroy {
   mqttSubscriptions: Subscription[] = [];
   deviceData: any[] = [];
   userDevicesTrigger: any[] = [];
+  consumptionData: any[] = [];
 
   constructor(
     public dialog: MatDialog,
@@ -42,6 +43,8 @@ export class TempComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.getUserDevices();
     this.getUserDevicesTrigger();
+    this.TodayConsumption();
+    this.MonthConsumption();
     this.dashService.isPageLoading(true);
   }
 
@@ -155,61 +158,149 @@ export class TempComponent implements OnInit, OnDestroy {
     return false; // Device data not available, consider it disconnected
   }
 
-  // isDeviceHeated(deviceUid: string): boolean {
-  //   const deviceTrigger = this.deviceData[this.getIndex(deviceUid)];
-  //   if (deviceTrigger) {
-  //     const trigger = this.userDevicesTrigger.find(trigger => trigger.DeviceUID === deviceUid);
-  //     if (trigger && deviceTrigger.TemperatureR) {
-  //       const triggerValue = trigger.TriggerValue;
-  //       const temperature = deviceTrigger.TemperatureR;
-  //       const isHeated = temperature < triggerValue;     
-  //       return isHeated;
-  //     }
-  //   }
-  //   return false; // Device or trigger not found, or missing temperature value
-  // }
 
   isDeviceHeated(deviceUid: string): boolean {
-  const deviceIndex = this.getIndex(deviceUid);
-  const deviceTrigger = this.deviceData[deviceIndex];
+    const deviceIndex = this.getIndex(deviceUid);
+    const deviceTrigger = this.deviceData[deviceIndex];
 
-  if (deviceTrigger) {
-    const trigger = this.userDevicesTrigger.find(trigger => trigger.DeviceUID === deviceUid);
+    if (deviceTrigger) {
+      const trigger = this.userDevicesTrigger.find(trigger => trigger.DeviceUID === deviceUid);
 
-    if (trigger) {
-      let temperature; // Variable to hold the temperature value
+      if (trigger) {
+        let temperature; // Variable to hold the temperature value
 
-      // Check if individual temperature parameters (R, Y, B) are available
-      if ('TemperatureR' in deviceTrigger && 'TemperatureY' in deviceTrigger && 'TemperatureB' in deviceTrigger) {
-        temperature = {
-          R: deviceTrigger.TemperatureR,
-          Y: deviceTrigger.TemperatureY,
-          B: deviceTrigger.TemperatureB,
-        };
-      } else if ('Temperature' in deviceTrigger) {
-        // Check if a single "Temperature" value is available
-        temperature = deviceTrigger.Temperature;
-      }
+        // Check if individual temperature parameters (R, Y, B) are available
+        if ('TemperatureR' in deviceTrigger && 'TemperatureY' in deviceTrigger && 'TemperatureB' in deviceTrigger) {
+          temperature = {
+            R: deviceTrigger.TemperatureR,
+            Y: deviceTrigger.TemperatureY,
+            B: deviceTrigger.TemperatureB,
+          };
+        } else if ('Temperature' in deviceTrigger) {
+          // Check if a single "Temperature" value is available
+          temperature = deviceTrigger.Temperature;
+        }
 
-      // Ensure that temperature data is available
-      if (temperature !== undefined) {
-        const triggerValue = trigger.TriggerValue;
+        // Ensure that temperature data is available
+        if (temperature !== undefined) {
+          const triggerValue = trigger.TriggerValue;
 
-        // Check the temperature and compare with the trigger value
-        if (typeof temperature === 'number' && temperature >triggerValue) {
-          return true; // Device is heated
-        } else if (typeof temperature === 'object') {
-          // Check individual temperature parameters
-          if (temperature.R > triggerValue || temperature.Y > triggerValue || temperature.B > triggerValue) {
+          // Check the temperature and compare with the trigger value
+          if (typeof temperature === 'number' && temperature >triggerValue) {
             return true; // Device is heated
+          } else if (typeof temperature === 'object') {
+            // Check individual temperature parameters
+            if (temperature.R > triggerValue || temperature.Y > triggerValue || temperature.B > triggerValue) {
+              return true; // Device is heated
+            }
           }
         }
       }
     }
+
+    return false; // Device or trigger not found, or missing temperature value
   }
 
-  return false; // Device or trigger not found, or missing temperature value
-}
+  getIndexConsumption(deviceUid: string): number {
+    return this.consumptionData.findIndex(device => device.DeviceUID === deviceUid);
+  }
+
+  TodayConsumption() {
+    if (this.CompanyEmail) {
+      this.dashDataService.getTodayConsumption(this.CompanyEmail).subscribe(
+        (data: any[]) => {
+          // Assuming data is an array of devices
+          this.consumptionData = [];
+
+          // Loop through each device
+          data.forEach(deviceData => {
+            const deviceInfo = Object.keys(deviceData)[0]; // Assuming each object has only one key
+
+            // Get consumption data for the device
+            const consumptionData = deviceData[deviceInfo][0];
+
+            // Calculate percentage change
+            const today = consumptionData.today;
+            const yesterday = consumptionData.yesterday;
+            let percentageChange;
+            // Handle division by zero
+              if (yesterday !== 0) {
+                percentageChange = ((today - yesterday) / yesterday) * 100;
+              } else {
+                percentageChange = -100;
+              }
+
+            // Create an object with device information and percentage change
+            const deviceInfoObject = {
+              DeviceUID: deviceInfo,
+              todayConsumption: today,
+              yesterdayConsumption: yesterday,
+              percentageChange: percentageChange
+            };
+
+            // Push the device object to the array
+            this.consumptionData.push(deviceInfoObject);
+          });
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    }
+  }
+
+  MonthConsumption() {
+    if (this.CompanyEmail) {
+      this.dashDataService.getMonthConsumption(this.CompanyEmail).subscribe(
+        (response: any) => {
+          // Check if 'data' property exists and is an object
+          const data = response;
+          if (typeof data === 'object' && data !== null) {
+            // Loop through each device
+            Object.keys(data).forEach(deviceInfo => {
+              // Get consumption data for the device
+              const consumptionData = data[deviceInfo][0];
+
+              // Find the corresponding device in consumptionData array
+              const deviceInfoObject = this.consumptionData.find(device => device.DeviceUID === deviceInfo);
+
+              if (deviceInfoObject) {
+                // Calculate percentage change for monthly consumption
+                const thisMonth = consumptionData.thisMonth;
+                const lastMonth = consumptionData.lastMonth;
+                let percentageChange;
+
+                // Handle division by zero
+                if (lastMonth !== 0) {
+                  percentageChange = ((thisMonth - lastMonth) / lastMonth) * 100;
+                } else {
+                  // If lastMonth is 0, set percentageChange to 100
+                  percentageChange = -100;
+                }
+
+                // Update the device object with monthly consumption data
+                deviceInfoObject.thisMonthConsumption = thisMonth / 1000;
+                deviceInfoObject.lastMonthConsumption = lastMonth / 1000;
+                deviceInfoObject.monthlyPercentageChange = percentageChange;
+              }
+              console.log(this.consumptionData);
+            });
+          } else {
+            console.error('Invalid response format. Expected an object.');
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+    }
+  }
 
 
+
+  getAbsPercentageChange(percentageChange: number | undefined): { value: number | undefined, arrow: string } {
+    const absValue = percentageChange ? Math.floor(Math.abs(percentageChange)) : undefined;
+    const arrow = percentageChange && percentageChange >= 0 ? '▲' : '▼';
+    return { value: absValue, arrow: arrow };
+  }
 }

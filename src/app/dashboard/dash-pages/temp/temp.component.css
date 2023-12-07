@@ -84,10 +84,6 @@
   zoom: 78%;
 }
 
-.trend-arrow{
-  color: green;
-}
-
 .live-tag {
   color: red;
 }
@@ -248,4 +244,13 @@
   100% {
     background-position: 100% 50%;
   }
+}
+
+
+.up{
+  color: green;
+}
+
+.down{
+  color: red;
 }

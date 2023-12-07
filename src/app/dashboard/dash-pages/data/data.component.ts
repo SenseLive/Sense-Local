@@ -13,7 +13,7 @@ HighchartsMore(Highcharts);
 @Component({
   selector: 'app-data',
   templateUrl: './data.component.html',
-  styleUrls: ['./data.component.css']
+  styleUrls: ['./data.component.css'],
 })
 export class DataComponent implements OnInit {
   constructor(
@@ -24,10 +24,10 @@ export class DataComponent implements OnInit {
     private datePipe: DatePipe,
     private router: Router
   ) {}
-  
+
   deviceOptions: any[] = [];
-  selectedDevice!: string ;
-  selectedDeviceInterval: any = '1hour';    
+  selectedDevice!: string;
+  selectedDeviceInterval: any = '1hour';
   CompanyEmail!: string | null;
   temperatureData: any[] = [];
   temperatureRData: any[] = [];
@@ -44,42 +44,46 @@ export class DataComponent implements OnInit {
   DeviceTrigger!: any;
   loading1 = true;
 
-
   ngOnInit() {
-  const sessionData = sessionStorage.getItem('data');
-  const sessionDataStatus = sessionStorage.getItem('dataStatus');
-  const sessionDevice = sessionStorage.getItem('device');
-  const sessionDeviceType = sessionStorage.getItem('deviceType');
-  
-  const loadData = () => {
-    if (sessionData && sessionDataStatus && sessionDevice && sessionDeviceType) {
-      const jsonData = JSON.parse(sessionData);
-      const jsonDataStatus = JSON.parse(sessionDataStatus);
-      this.DeviceType = sessionDeviceType;
-      console.log("sessionDeviceType :-", this.DeviceType);
+    const sessionData = sessionStorage.getItem('data');
+    const sessionDataStatus = sessionStorage.getItem('dataStatus');
+    const sessionDevice = sessionStorage.getItem('device');
+    const sessionDeviceType = sessionStorage.getItem('deviceType');
 
-      // Use setTimeout for the delay
-      setTimeout(() => {
-        this.processChartData(jsonData);
-        this.createDonutChart(jsonDataStatus.dataStatus);
-        this.fetchDeviceInfo(sessionDevice);
-      }, 1000);
-    } else {
-      this.getUserDevices();
-    }
-  };
 
-  loadData();
-  this.consuptionData = [
-    { category: 'Category 1', value: 30 },
-    { category: 'Category 2', value: 60 },
-    { category: 'Category 3', value: 80 },
-    { category: 'Category 1', value: 30 },
-    { category: 'Category 2', value: 60 },
-    { category: 'Category 3', value: 80 }
-  ];
-}
+    const loadData = () => {
+      if (
+        sessionData &&
+        sessionDataStatus &&
+        sessionDevice &&
+        sessionDeviceType
+      ) {
+        const jsonData = JSON.parse(sessionData);
+        const jsonDataStatus = JSON.parse(sessionDataStatus);
+        this.DeviceType = sessionDeviceType;
+        console.log('sessionDeviceType :-', this.DeviceType);
 
+        // Use setTimeout for the delay
+        setTimeout(() => {
+          this.processChartData(jsonData);
+          this.createDonutChart(jsonDataStatus.dataStatus);
+          this.fetchDeviceInfo(sessionDevice);
+        }, 1000);
+      } else {
+        this.getUserDevices();
+      }
+    };
+
+    loadData();
+    this.consuptionData = [
+      { category: 'Category 1', value: 30 },
+      { category: 'Category 2', value: 60 },
+      { category: 'Category 3', value: 80 },
+      { category: 'Category 1', value: 30 },
+      { category: 'Category 2', value: 60 },
+      { category: 'Category 3', value: 80 },
+    ];
+  }
 
   getUserDevices() {
     this.CompanyEmail = this.authService.getCompanyEmail();
@@ -92,7 +96,7 @@ export class DataComponent implements OnInit {
             this.DeviceType = this.deviceOptions[0].DeviceType;
             sessionStorage.setItem('device', this.selectedDevice);
             sessionStorage.setItem('deviceType', this.DeviceType);
-            console.log("Bydefault DeviceType", this.DeviceType);
+            console.log('Bydefault DeviceType', this.DeviceType);
 
             this.fetchDefaultData();
             this.fetchDeviceInfo(this.selectedDevice);
@@ -100,9 +104,9 @@ export class DataComponent implements OnInit {
         },
         (error) => {
           this.snackBar.open('Error while fetching user devices!', 'Dismiss', {
-            duration: 2000
-        });
-      }
+            duration: 2000,
+          });
+        }
       );
     }
   }
@@ -117,33 +121,36 @@ export class DataComponent implements OnInit {
           linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
           stops: [
             [0, '#78f5e6'], // Start color (light green)
-            [1, '#43ab72']  // End color (darker green)
-          ]
+            [1, '#43ab72'], // End color (darker green)
+          ],
         };
       } else if (entry.status === 'heating') {
         color = {
           linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
           stops: [
-            [0, '#f0afad'],  // Start color (light red)
-            [1, 'rgba(255, 0, 0, 1)']   // End color (darker red)
-          ]
+            [0, '#f0afad'], // Start color (light red)
+            [1, 'rgba(255, 0, 0, 1)'], // End color (darker red)
+          ],
         };
       } else {
         color = {
           linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
           stops: [
-            [0, '#E0E0E0'],  // Start color (default light gray)
-            [1, '#B1B1B1']   // End color (default darker gray)
-          ]
+            [0, '#E0E0E0'], // Start color (default light gray)
+            [1, '#B1B1B1'], // End color (default darker gray)
+          ],
         };
       }
-      const time = entry.count >= 180 ? (entry.count / 180).toFixed(2) + ' hrs' : (entry.count / 3).toFixed(2) + ' mins';
+      const time =
+        entry.count >= 180
+          ? (entry.count / 180).toFixed(2) + ' hrs'
+          : (entry.count / 3).toFixed(2) + ' mins';
 
       return {
         name: entry.status,
         y: formattedPercentage,
         color: color,
-        time : time
+        time: time,
       };
     });
 
@@ -151,13 +158,13 @@ export class DataComponent implements OnInit {
 
     const options: Highcharts.Options = {
       chart: {
-        type: 'pie'
+        type: 'pie',
       },
       title: {
-        text: '   '
+        text: '   ',
       },
       credits: {
-        enabled: false
+        enabled: false,
       },
       plotOptions: {
         pie: {
@@ -170,16 +177,19 @@ export class DataComponent implements OnInit {
               fontWeight: 'bold'
             }
           }*/
-        }
+        },
       },
       tooltip: {
-        pointFormat: '{series.name}: <b>{point.y}%</b> <br><b>({point.time})<b>'
+        pointFormat:
+          '{series.name}: <b>{point.y}%</b> <br><b>({point.time})<b>',
       },
-      series: [{
-        type: 'pie',
-        name: 'Time',
-        data: donutChartData
-      }]
+      series: [
+        {
+          type: 'pie',
+          name: 'Time',
+          data: donutChartData,
+        },
+      ],
     };
 
     Highcharts.chart('donutChart', options);
@@ -188,140 +198,146 @@ export class DataComponent implements OnInit {
   createChart() {
     Highcharts.chart('curvedLineChart', {
       chart: {
-        type: 'spline'
+        type: 'spline',
       },
       title: {
-        text: ''
+        text: '',
       },
       credits: {
-            enabled: false // Disable the credits display
-          },
+        enabled: false, // Disable the credits display
+      },
 
       xAxis: {
         type: 'datetime',
-        timezoneOffset: 330
+        timezoneOffset: 330,
       },
       yAxis: {
         title: {
-          text: 'Temperature'
-        }
-      },
-      series: [{
-        name: 'Temperature',
-        color: {
-          linearGradient: {
-            x1: 0,
-            x2: 0,
-            y1: 0,
-            y2: 1
-          },
-          stops: [
-            [0, 'rgba(255, 0, 0, 1)'],    // Start color (red)
-            [1, 'rgba(255, 255, 0, 0.3)'] // End color (yellow)
-          ]
+          text: 'Temperature',
         },
-        data: this.temperatureData
-      }] as any
+      },
+      series: [
+        {
+          name: 'Temperature',
+          color: {
+            linearGradient: {
+              x1: 0,
+              x2: 0,
+              y1: 0,
+              y2: 1,
+            },
+            stops: [
+              [0, 'rgba(255, 0, 0, 1)'], // Start color (red)
+              [1, 'rgba(255, 255, 0, 0.3)'], // End color (yellow)
+            ],
+          },
+          data: this.temperatureData,
+        },
+      ] as any,
     } as Highcharts.Options);
   }
 
   createChart2() {
     Highcharts.chart('curvedLineChart2', {
       chart: {
-        type: 'spline'
+        type: 'spline',
       },
       title: {
-        text: ''
+        text: '',
       },
       credits: {
-            enabled: false // Disable the credits display
-          },
+        enabled: false, // Disable the credits display
+      },
 
       xAxis: {
-        type: 'datetime'
+        type: 'datetime',
       },
       yAxis: {
         title: {
-          text: 'Humidity'
-        }
-      },
-      series: [{
-        name: 'Humitidy',
-        color: {
-          linearGradient: {
-            x1: 0,
-            x2: 0,
-            y1: 0,
-            y2: 1
-          },
-          stops: [
-            [0, 'rgba(0, 0, 255, 1)'],    // Start color (blue)
-            [1, 'rgba(0, 255, 255, 0.3)'] // End color (cyan)
-          ]
+          text: 'Humidity',
         },
-        data: this.humidityData
-      }] as any
+      },
+      series: [
+        {
+          name: 'Humitidy',
+          color: {
+            linearGradient: {
+              x1: 0,
+              x2: 0,
+              y1: 0,
+              y2: 1,
+            },
+            stops: [
+              [0, 'rgba(0, 0, 255, 1)'], // Start color (blue)
+              [1, 'rgba(0, 255, 255, 0.3)'], // End color (cyan)
+            ],
+          },
+          data: this.humidityData,
+        },
+      ] as any,
     } as Highcharts.Options);
   }
 
   createChart3() {
     Highcharts.chart('curvedLineChart3', {
       chart: {
-        type: 'spline'
+        type: 'spline',
       },
       title: {
-        text: ''
+        text: '',
       },
       credits: {
-            enabled: false // Disable the credits display
-          },
+        enabled: false, // Disable the credits display
+      },
 
       xAxis: {
         type: 'datetime',
-        timezoneOffset: 330
+        timezoneOffset: 330,
       },
       yAxis: {
         title: {
-          text: 'Flow Rate'
-        }
-      },
-      series: [{
-        name: 'Flow Rate',
-        color: {
-          linearGradient: {
-            x1: 0,
-            x2: 0,
-            y1: 0,
-            y2: 1
-          },
-          stops: [
-            [0, 'rgba(0, 0, 255, 1)'],    // Start color (blue)
-            [1, 'rgba(0, 255, 255, 0.3)'] // End color (yellow)
-          ]
+          text: 'Flow Rate',
         },
-        data: this.flowRateData
-      }] as any
+      },
+      series: [
+        {
+          name: 'Flow Rate',
+          color: {
+            linearGradient: {
+              x1: 0,
+              x2: 0,
+              y1: 0,
+              y2: 1,
+            },
+            stops: [
+              [0, 'rgba(0, 0, 255, 1)'], // Start color (blue)
+              [1, 'rgba(0, 255, 255, 0.3)'], // End color (yellow)
+            ],
+          },
+          data: this.flowRateData,
+        },
+      ] as any,
     } as Highcharts.Options);
   }
 
   createTemperature() {
     Highcharts.chart('temperatureRYB', {
       chart: {
-        type: 'spline'
+        type: 'spline',
       },
       title: {
-        text: ''
+        text: '',
       },
       credits: {
-        enabled: false 
+        enabled: false,
       },
       xAxis: {
         type: 'datetime',
-        timezoneOffset: 330
+        timezoneOffset: 330,
       },
       yAxis: {
         title: {
-          text: 'Temperature RYB'
+          text: 'Temperature RYB',
         },
         // min: 0,
         // max: 100,
@@ -332,84 +348,83 @@ export class DataComponent implements OnInit {
           color: {
             linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
             stops: [
-              [0, 'rgba(255, 0, 0, 1)'],    // Start color (red)
-              [1, 'rgba(255, 255, 0, 0.3)'] // End color (yellow)
-            ]
+              [0, 'rgba(255, 0, 0, 1)'], // Start color (red)
+              [1, 'rgba(255, 255, 0, 0.3)'], // End color (yellow)
+            ],
           },
           data: this.temperatureRData,
-          lineWidth: 3 // Set the line width to triple
+          lineWidth: 3, // Set the line width to triple
         },
         {
           name: 'Temperature B',
           color: {
             linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
             stops: [
-              [0, 'rgba(0, 0, 255, 1)'],    // Start color (blue)
-              [1, 'rgba(0, 255, 255, 0.3)'] // End color (cyan)
-            ]
+              [0, 'rgba(0, 0, 255, 1)'], // Start color (blue)
+              [1, 'rgba(0, 255, 255, 0.3)'], // End color (cyan)
+            ],
           },
           data: this.temperatureBData,
-          lineWidth: 3 // Set the line width to triple
+          lineWidth: 3, // Set the line width to triple
         },
         {
           name: 'Temperature Y',
           color: {
             linearGradient: { x1: 0, x2: 0, y1: 0, y2: 1 },
             stops: [
-              [0, 'rgba(255, 255, 0, 0.3)'],    // Start color (yellow)
-              [1, 'rgba(255, 0, 0, 1)'] // End color (red)
-            ]
+              [0, 'rgba(255, 255, 0, 0.3)'], // Start color (yellow)
+              [1, 'rgba(255, 0, 0, 1)'], // End color (red)
+            ],
           },
           data: this.temperatureYData,
-          lineWidth: 3 // Set the line width to triple
+          lineWidth: 3, // Set the line width to triple
         },
-      ] as any
+      ] as any,
     } as Highcharts.Options);
   }
 
   createBarGraph() {
     Highcharts.chart('barChart', {
       chart: {
-        type: 'column'  // Specify the chart type as 'bar'
+        type: 'column', // Specify the chart type as 'bar'
       },
       title: {
-        text: ''
+        text: '',
       },
       credits: {
-        enabled: false // Disable the credits display
+        enabled: false, // Disable the credits display
       },
       xAxis: {
-        categories: this.consuptionData.map(dataPoint => dataPoint.category), // Specify categories for each bar
+        categories: this.consuptionData.map((dataPoint) => dataPoint.category), // Specify categories for each bar
         title: {
-          text: 'Categories'
-        }
+          text: 'Categories',
+        },
       },
       yAxis: {
         title: {
-          text: 'Temperature'
-        }
-      },
-      series: [{
-        name: 'Temperature',
-        color: {
-          linearGradient: {
-            x1: 0,
-            x2: 0,
-            y1: 0,
-            y2: 1
-          },
-          stops: [
-            [0, 'rgba(255, 0, 0, 1)'],    // Start color (red)
-            [1, 'rgba(255, 255, 0, 0.3)'] // End color (yellow)
-          ]
+          text: 'Temperature',
         },
-        data: this.consuptionData.map(dataPoint => dataPoint.value) // Specify the temperature values for each category
-      }] as any
+      },
+      series: [
+        {
+          name: 'Temperature',
+          color: {
+            linearGradient: {
+              x1: 0,
+              x2: 0,
+              y1: 0,
+              y2: 1,
+            },
+            stops: [
+              [0, 'rgba(255, 0, 0, 1)'], // Start color (red)
+              [1, 'rgba(255, 255, 0, 0.3)'], // End color (yellow)
+            ],
+          },
+          data: this.consuptionData.map((dataPoint) => dataPoint.value), // Specify the temperature values for each category
+        },
+      ] as any,
     } as Highcharts.Options);
   }
-
-  
-  
 
   openFilterDailog(): void {
     const dialogConfig = new MatDialogConfig();
@@ -419,14 +434,20 @@ export class DataComponent implements OnInit {
 
     const dialogRef = this.dialog.open(FilterComponent, dialogConfig);
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result && result.data && result.dataStatus && result.device && result.deviceType) {
+    dialogRef.afterClosed().subscribe((result) => {
+      if (
+        result &&
+        result.data &&
+        result.dataStatus &&
+        result.device &&
+        result.deviceType
+      ) {
         sessionStorage.setItem('data', JSON.stringify(result.data));
         sessionStorage.setItem('dataStatus', JSON.stringify(result.dataStatus));
         sessionStorage.setItem('device', result.device);
         sessionStorage.setItem('deviceType', result.deviceType);
         this.DeviceType = result.deviceType;
-        console.log("Filter Interval Device Type :- ", this.DeviceType);
+        console.log('Filter Interval Device Type :- ', this.DeviceType);
 
         // Introduce a delay before processing the result
         setTimeout(() => {
@@ -441,11 +462,16 @@ export class DataComponent implements OnInit {
         const sessionDevice = sessionStorage.getItem('device');
         const sessionDeviceType = sessionStorage.getItem('deviceType');
 
-        if (sessionData && sessionDataStatus && sessionDevice && sessionDeviceType) {
+        if (
+          sessionData &&
+          sessionDataStatus &&
+          sessionDevice &&
+          sessionDeviceType
+        ) {
           const jsonData = JSON.parse(sessionData);
           const jsonDataStatus = JSON.parse(sessionDataStatus);
           this.DeviceType = sessionDeviceType;
-          console.log("Filter Close Device Type :- ", this.DeviceType);
+          console.log('Filter Close Device Type :- ', this.DeviceType);
 
           // Introduce a delay before processing the result
           setTimeout(() => {
@@ -456,7 +482,7 @@ export class DataComponent implements OnInit {
           }, 1000); // Adjust the delay as needed
         } else {
           this.snackBar.open('No session storage data available!', 'Dismiss', {
-            duration: 2000
+            duration: 2000,
           });
           this.fetchDefaultData();
           this.router.navigate([this.router.url]);
@@ -465,31 +491,33 @@ export class DataComponent implements OnInit {
     });
   }
 
-
   fetchDefaultData() {
-    if(this.selectedDevice){
-      this.DashDataService.dataLast(this.selectedDevice, this.selectedDeviceInterval).subscribe(
+    if (this.selectedDevice) {
+      this.DashDataService.dataLast(
+        this.selectedDevice,
+        this.selectedDeviceInterval
+      ).subscribe(
         (data: any) => {
           sessionStorage.setItem('data', JSON.stringify(data));
           sessionStorage.setItem('dataType', this.DeviceType);
           this.processChartData(data);
-          this.DashDataService.dataLastStatus(this.selectedDevice, this.selectedDeviceInterval).subscribe(
-            (dataStatus: any) => {
-              sessionStorage.setItem('dataStatus', JSON.stringify(dataStatus));
-              this.createDonutChart(dataStatus.dataStatus); 
-            }
-          );
+          this.DashDataService.dataLastStatus(
+            this.selectedDevice,
+            this.selectedDeviceInterval
+          ).subscribe((dataStatus: any) => {
+            sessionStorage.setItem('dataStatus', JSON.stringify(dataStatus));
+            this.createDonutChart(dataStatus.dataStatus);
+          });
         },
         (error) => {
           this.snackBar.open('Error while fetching last data!', 'Dismiss', {
-            duration: 2000
+            duration: 2000,
           });
-      }
+        }
       );
-    }
-    else{
+    } else {
       this.snackBar.open('Not Defined!', 'Dismiss', {
-        duration: 2000
+        duration: 2000,
       });
     }
   }
@@ -500,39 +528,39 @@ export class DataComponent implements OnInit {
 
     this.temperatureData = data.map((entry: any) => [
       new Date(entry.TimeStamp).getTime() + istOffset,
-      entry.Temperature
+      entry.Temperature,
     ]);
 
     this.humidityData = data.map((entry: any) => [
       new Date(entry.TimeStamp).getTime() + istOffset,
-      entry.Humidity
+      entry.Humidity,
     ]);
 
     // Convert TemperatureR, TemperatureY, and TemperatureB values to numbers
     this.temperatureRData = data.map((entry: any) => [
       new Date(entry.TimeStamp).getTime() + istOffset,
-      parseFloat(entry.TemperatureR)
+      parseFloat(entry.TemperatureR),
     ]);
-  
+
     this.temperatureYData = data.map((entry: any) => [
       new Date(entry.TimeStamp).getTime() + istOffset,
-      parseFloat(entry.TemperatureY)
+      parseFloat(entry.TemperatureY),
     ]);
-  
+
     this.temperatureBData = data.map((entry: any) => [
       new Date(entry.TimeStamp).getTime() + istOffset,
-      parseFloat(entry.TemperatureB)
+      parseFloat(entry.TemperatureB),
     ]);
-  
-    this.timestampData = data.map((entry: any) =>
-      new Date(entry.TimeStamp).getTime() + istOffset
+
+    this.timestampData = data.map(
+      (entry: any) => new Date(entry.TimeStamp).getTime() + istOffset
     );
 
     this.flowRateData = data.map((entry: any) => [
       new Date(entry.TimeStamp).getTime() + istOffset,
-      entry.flowRate
+      entry.flowRate,
     ]);
-  
+
     if (this.DeviceType === 'th') {
       this.createChart();
       this.createChart2();
@@ -540,15 +568,13 @@ export class DataComponent implements OnInit {
       this.createChart();
     } else if (this.DeviceType === 'ryb') {
       this.createTemperature();
-    } else if (this.DeviceType === 'ws'){
+    } else if (this.DeviceType === 'ws') {
       this.createChart3();
       this.createBarGraph();
-    } else{
-      console.log("Device Type is not found!");
+    } else {
+      console.log('Device Type is not found!');
     }
   }
-  
-
 
   fetchDeviceInfo(deviceId: string) {
     this.DashDataService.deviceDetails(deviceId).subscribe(
@@ -570,10 +596,10 @@ export class DataComponent implements OnInit {
       },
       (error) => {
         this.snackBar.open('Error while fetching last data!', 'Dismiss', {
-          duration: 2000
+          duration: 2000,
         });
       }
-    ); 
+    );
   }
 
   formatTime(lastUpdatedTime: string): string {
@@ -590,14 +616,17 @@ export class DataComponent implements OnInit {
       const hours = Math.floor(diff / 3600);
       return `${hours} hour ago`;
     } else {
-      const formattedTime = this.datePipe.transform(updatedTime, 'yyyy-MM-dd hh:mm:ss');
-      return formattedTime || ''; 
+      const formattedTime = this.datePipe.transform(
+        updatedTime,
+        'yyyy-MM-dd hh:mm:ss'
+      );
+      return formattedTime || '';
     }
   }
 
-  refresh(){
+  refresh() {
     const deviceId = sessionStorage.getItem('device');
-    if(deviceId){
+    if (deviceId) {
       this.fetchDeviceInfo(deviceId);
     }
   }
