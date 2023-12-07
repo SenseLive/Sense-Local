@@ -21,48 +21,57 @@
               <div class="row" *ngIf="device.DeviceType === 'th'">
                 <div class="col-6 d-flex">
                   <img src="../../../../assets/img/tm.gif" class="card-img">
-                  <div class="image-text"> {{ deviceData[getIndex(device.DeviceUID)]?.Temperature }} &deg;C
+                  <div class="image-text"> {{ (deviceData[getIndex(device.DeviceUID)]?.Temperature|| 0).toFixed(0) }} &deg;C
                   </div>
                 </div>
                 <div class="col-6 d-flex">
                   <img src="../../../../assets/img/hm.gif" class="card-img">
-                  <div class="image-text">{{ deviceData[getIndex(device.DeviceUID)]?.Humidity }}%</div>
+                  <div class="image-text">{{ (deviceData[getIndex(device.DeviceUID)]?.Humidity|| 0).toFixed(0) }}%</div>
                 </div>
               </div>
               <div class="row" *ngIf="device.DeviceType === 'ryb'">
                 <div class="col-4 d-flex">
                   <img src="../../../../assets/img/tm.gif" class="card-img-ryb">
-                  <div class="image-text-ryb"> {{ deviceData[getIndex(device.DeviceUID)]?.TemperatureR }} &deg;C</div>
+                  <div class="image-text-ryb"> {{ (deviceData[getIndex(device.DeviceUID)]?.TemperatureR|| 0).toFixed(0) }} &deg;C</div>
                 </div>
                 <div class="col-4 d-flex">
                   <img src="../../../../assets/img/tm.gif" class="card-img-ryb">
-                  <div class="image-text-ryb">{{ deviceData[getIndex(device.DeviceUID)]?.TemperatureY }} &deg;C</div>
+                  <div class="image-text-ryb">{{ (deviceData[getIndex(device.DeviceUID)]?.TemperatureY|| 0).toFixed(0) }} &deg;C</div>
                 </div>
                 <div class="col-4 d-flex">
                   <img src="../../../../assets/img/tm.gif" class="card-img-ryb">
-                  <div class="image-text-ryb">{{ deviceData[getIndex(device.DeviceUID)]?.TemperatureB }} &deg;C</div>
+                  <div class="image-text-ryb">{{ (deviceData[getIndex(device.DeviceUID)]?.TemperatureB|| 0).toFixed(0) }} &deg;C</div>
                 </div>
               </div>
               <div class="row" *ngIf="device.DeviceType === 't'">
                 <div class="col-12 d-flex">
                   <img src="../../../../assets/img/tm.gif" class="card-img">
-                  <div class="image-text"> {{ deviceData[getIndex(device.DeviceUID)]?.Temperature }} &deg;C</div>
+                  <div class="image-text"> {{ (deviceData[getIndex(device.DeviceUID)]?.Temperature|| 0).toFixed(0) }} &deg;C</div>
                 </div>
               </div>
               <div class="row" *ngIf="device.DeviceType === 'ws'">
                 <div class="col-4 d-flex">
                   <img src="../../../../assets/img/ws1.png" class="card-img-ryb">
-                  <div class="image-text-ws-3">{{ (deviceData[getIndex(device.DeviceUID)]?.flowRate || 00).toFixed(2) }} 
-                    <div class="image-text-ws-3">ml/s</div>
+                  <div class="image-text-ws-3">{{ (deviceData[getIndex(device.DeviceUID)]?.flowRate || 00).toFixed(0) }} 
+                    <div class="image-text-ws-3">l/hr</div>
                   </div>
                 </div>
                 <div class="col-4">
-                  <div class="image-text-ws">5000L</div>
-                  <div class="image-text-ws-2"><span class="trend-arrow">▲ 20% </span>Today</div>
+                  <div class="image-text-ws">{{ consumptionData[getIndexConsumption(device.DeviceUID)]?.todayConsumption|| 0 }} L</div>
+                  <div class="image-text-ws-2">
+                    <span class="{{ consumptionData[getIndexConsumption(device.DeviceUID)]?.percentageChange >= 0 ? 'up' : 'down' }}">
+                      {{ getAbsPercentageChange(consumptionData[getIndexConsumption(device.DeviceUID)]?.percentageChange).arrow }}
+                      {{ getAbsPercentageChange(consumptionData[getIndexConsumption(device.DeviceUID)]?.percentageChange).value || 0 }}%
+                    </span>
+                    Today
+                  </div>
                 </div>
                 <div class="col-4">
-                  <div class="image-text-ws">5000KL</div>
-                  <div class="image-text-ws-2"><span class="trend-arrow">▲ 20% </span>This Month</div>
+                  <div class="image-text-ws">{{ consumptionData[getIndexConsumption(device.DeviceUID)]?.thisMonthConsumption }} KL</div>
+                  <div class="image-text-ws-2"><span class="{{ consumptionData[getIndexConsumption(device.DeviceUID)]?.monthlyPercentageChange >= 0 ? 'up' : 'down' }}">
+                      {{ getAbsPercentageChange(consumptionData[getIndexConsumption(device.DeviceUID)]?.monthlyPercentageChange).arrow }}
+                      {{ getAbsPercentageChange(consumptionData[getIndexConsumption(device.DeviceUID)]?.monthlyPercentageChange).value|| 0 }}%
+                    </span>This Month</div>
                 </div>
               </div>
             </mat-card-content>

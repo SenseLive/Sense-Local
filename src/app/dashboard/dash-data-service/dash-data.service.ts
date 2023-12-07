@@ -11,8 +11,8 @@ export class DashDataService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  private readonly API_URL = 'http://ec2-13-127-141-210.ap-south-1.compute.amazonaws.com:3000';
-  //private readonly API_URL = 'http://localhost:3000';
+  //private readonly API_URL = 'http://ec2-13-127-141-210.ap-south-1.compute.amazonaws.com:3000';
+  private readonly API_URL = 'http://localhost:3000';
 
   userDevices(CompanyEmail: string): Observable<any> {
     return this.http.get(`${this.API_URL}/userdevices/${CompanyEmail}`);
@@ -98,5 +98,13 @@ export class DashDataService {
   }
   getDevicecount(): Observable<any> {
     return this.http.get(`${this.API_URL}/devInfo`);
+  }
+
+  getTodayConsumption(CompanyEmail: string): Observable<any> {
+    return this.http.get(`${this.API_URL}/Total-Volume-Today-Email/${CompanyEmail}`);
+  }
+
+  getMonthConsumption(CompanyEmail: string): Observable<any> {
+    return this.http.get(`${this.API_URL}/Total-Volume-Month-Email/${CompanyEmail}`);
   }
 }
