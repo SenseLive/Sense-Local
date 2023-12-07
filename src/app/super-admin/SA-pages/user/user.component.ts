@@ -109,7 +109,7 @@ openbloackuserSwal(element: any){
 }
 
  
-   //function for delete user 
+  
   deleteUser(user: PeriodicElement) {
     const userId = user.UserId; 
     this.service.deleteUser(userId).subscribe(

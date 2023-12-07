@@ -8,6 +8,9 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class DashDataService {
+  deleteDevice(deviceUid: string) {
+    throw new Error('Method not implemented.');
+  }
 
   constructor(private http: HttpClient, private router: Router) {}
 
@@ -99,4 +102,9 @@ export class DashDataService {
   getDevicecount(): Observable<any> {
     return this.http.get(`${this.API_URL}/devInfo`);
   }
+
+  deleteUser(userId: string): Observable<any> {
+    return this.http.delete(`${this.API_URL}/removeUser/${userId}`);
+  }
+
 }

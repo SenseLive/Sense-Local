@@ -7,8 +7,9 @@ import { AddUserComponent } from '../../dash-component/add-user/add-user.compone
 import { AddDeviceComponent } from '../../dash-component/add-device/add-device.component';
 import { interval, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
-import{ DashService } from '../../dash.service';
-
+import { DashService } from '../../dash.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-user-manage',
@@ -17,8 +18,8 @@ import{ DashService } from '../../dash.service';
 })
 export class UserManageComponent implements OnInit, OnDestroy {
   CompanyEmail!: string | null;
-  displayedColumns: string[] = ['Name', 'Contact', 'Designation', 'Status'];
-  displayedColumns2: string[] = ['DeviceName', 'Location', 'IssueDate', 'Status','DeviceType'];
+  displayedColumns: string[] = ['Name', 'Contact', 'Designation', 'Status', 'Actions'];
+  displayedColumns2: string[] = ['DeviceName', 'Location', 'IssueDate', 'Status', 'DeviceType', 'Actions2'];
   dataSource: UserData[] = [];
   dataSource2: DeviceData[] = [];
   totalUsers: number = 0;
@@ -34,7 +35,8 @@ export class UserManageComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private dashDataService: DashDataService,
     private datePipe: DatePipe,
-    public dashService: DashService
+    public dashService: DashService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
@@ -71,10 +73,12 @@ export class UserManageComponent implements OnInit, OnDestroy {
     if (this.CompanyEmail) {
       this.dashDataService.companyUsers(this.CompanyEmail).subscribe(
         (users) => {
+          // Log the data received from the API
           this.dataSource = users.map((user: UserData) => {
             user.status = user.is_online === 1 ? 'Online' : 'Offline';
             return user;
           });
+
           this.totalUsers = users.length;
           this.totalOnlineUsers = this.dataSource.filter(user => user.is_online === 1).length;
           this.totalOfflineUsers = this.dataSource.filter(user => user.is_online === 0).length;
@@ -82,6 +86,7 @@ export class UserManageComponent implements OnInit, OnDestroy {
         },
         (error) => {
           // Handle error
+          console.error('Error fetching users:', error);
         }
       );
     }
@@ -95,6 +100,7 @@ export class UserManageComponent implements OnInit, OnDestroy {
             device.formattedIssueDate = this.datePipe.transform(device.IssueDate, 'yyyy-MM-dd HH:mm:ss');
             return device;
           });
+          console.log(this.dataSource2);
 
           this.dataSource2 = devices.devices.map((device: DeviceData) => {
             if (device.status === "online" || device.status === "heating") {
@@ -103,7 +109,7 @@ export class UserManageComponent implements OnInit, OnDestroy {
               device.Status = 'Offline';
             }
             return device;
-          });          
+          });
 
           this.totalDevices = this.dataSource2.length;
           this.totalActiveDevices = this.dataSource2.filter(devices => devices.status === "online" || devices.status === "heating").length;
@@ -134,6 +140,77 @@ export class UserManageComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(AddDeviceComponent, dialogConfig);
     dialogRef.afterClosed().subscribe(deviceAdded => {});
   }
+
+  editUser(user: UserData): void {
+    // Implement your edit logic here
+    console.log('Editing user');
+  }
+
+  // Function to delete a user
+  editDevice(device: DeviceData): void {
+    // Implement your edit logic here
+    console.log('Editing Device');
+  }
+
+  // Function to delete a user
+  deleteDevice(device: DeviceData): void {
+    const deviceid = device.DeviceUID;
+    console.log(deviceid);
+
+    // add more code when api is created
+    
+  }
+
+  deleteUser(user: UserData) {
+    const userId = user.UserId;
+  
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!"
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // User clicked 'Yes' in the confirmation dialog
+        this.dashDataService.deleteUser(userId).subscribe(
+          () => {
+            // User deleted successfully
+            Swal.fire({
+              title: "Deleted!",
+              text: "User has been deleted.",
+              icon: "success",
+              timer: 2000,
+              timerProgressBar: true
+            });
+  
+            // Remove the deleted user from the local data source
+            const index = this.dataSource.indexOf(user);
+            if (index !== -1) {
+              this.dataSource.splice(index, 1);
+            }
+  
+            // Update the MatTableDataSource
+            this.dataSource = [...this.dataSource];
+          },
+          (error) => {
+            // Error deleting user
+            console.error('Error deleting user:', error);
+            Swal.fire({
+              title: "Error",
+              text: "Error deleting user",
+              icon: "error",
+              timer: 2000,
+              timerProgressBar: true
+            });
+          }
+        );
+      }
+    });
+  }
+  
 }
 
 export interface UserData {
@@ -145,6 +222,7 @@ export interface UserData {
   UserType: string;
   is_online: number;
   status: string;
+  UserId: any; // Corrected property name to "UserId"
 }
 
 export interface DeviceData {
