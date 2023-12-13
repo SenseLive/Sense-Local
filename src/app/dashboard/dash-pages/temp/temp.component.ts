@@ -227,7 +227,7 @@ export class TempComponent implements OnInit, OnDestroy {
               if (yesterday !== 0) {
                 percentageChange = ((today - yesterday) / yesterday) * 100;
               } else {
-                percentageChange = -100;
+                percentageChange = 100;
               }
 
             // Create an object with device information and percentage change
@@ -275,7 +275,7 @@ export class TempComponent implements OnInit, OnDestroy {
                   percentageChange = ((thisMonth - lastMonth) / lastMonth) * 100;
                 } else {
                   // If lastMonth is 0, set percentageChange to 100
-                  percentageChange = -100;
+                  percentageChange = 100;
                 }
 
                 // Update the device object with monthly consumption data

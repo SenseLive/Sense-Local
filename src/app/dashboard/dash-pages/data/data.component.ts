@@ -442,10 +442,10 @@ export class DataComponent implements OnInit {
         result.device &&
         result.deviceType
       ) {
-        sessionStorage.setItem('data', JSON.stringify(result.data));
-        sessionStorage.setItem('dataStatus', JSON.stringify(result.dataStatus));
-        sessionStorage.setItem('device', result.device);
-        sessionStorage.setItem('deviceType', result.deviceType);
+        // sessionStorage.setItem('data', JSON.stringify(result.data));
+        // sessionStorage.setItem('dataStatus', JSON.stringify(result.dataStatus));
+        // sessionStorage.setItem('device', result.device);
+        // sessionStorage.setItem('deviceType', result.deviceType);
         this.DeviceType = result.deviceType;
         console.log('Filter Interval Device Type :- ', this.DeviceType);
 
@@ -523,6 +523,7 @@ export class DataComponent implements OnInit {
   }
 
   processChartData(response: any) {
+    console.log(response);
     const data = response.data;
     const istOffset = 5.5 * 60 * 60 * 1000; // IST offset: +5:30 in milliseconds
 

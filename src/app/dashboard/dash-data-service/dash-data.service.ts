@@ -118,6 +118,10 @@ export class DashDataService {
   }
   
   getIntervalConsuption( deviceId : string, duration: any ): Observable <any>{
-    return this.http.get(`${this.API_URL}/ConsuptionByIntervalBar/${deviceId}?duration=${duration}` )
+    return this.http.get(`${this.API_URL}/ConsuptionByIntervalBar/${deviceId}?duration=${duration}`);
+  }
+
+  getCustomConsumption(deviceId: string, startDate:any, endDate: any): Observable <any>{
+    return this.http.get(`${this.API_URL}/ConsuptionByCustomBar/${deviceId}/${startDate}/${endDate}`);
   }
 }
