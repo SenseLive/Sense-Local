@@ -10,7 +10,7 @@
         <mat-label>Device Name</mat-label>
         <mat-select [(ngModel)]="selectedDevice" required>
           <mat-option *ngFor="let device of deviceOptions" [value]="device.DeviceUID" (click)="open(device)">
-            {{ device.DeviceUID }}
+            {{ device.DeviceName }}
           </mat-option>
         </mat-select>
       </mat-form-field>

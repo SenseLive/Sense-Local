@@ -44,47 +44,55 @@ export class DataComponent implements OnInit {
   DeviceTrigger!: any;
   loading1 = true;
 
+  // new constants
+
+  deviceID!:string;
+  deviceTYPE!:string;
+  deviceINTERVAL!:string;
+  deviceSTART!:string;
+  deviceEND!:string;
+
   ngOnInit() {
     this.getUserDevices();
     this.retrievingValues();
-    const sessionData = sessionStorage.getItem('data');
-    const sessionDataStatus = sessionStorage.getItem('dataStatus');
-    const sessionDevice = sessionStorage.getItem('device');
-    const sessionDeviceType = sessionStorage.getItem('deviceType');
+    // const sessionData = sessionStorage.getItem('data');
+    // const sessionDataStatus = sessionStorage.getItem('dataStatus');
+    // const sessionDevice = sessionStorage.getItem('device');
+    // const sessionDeviceType = sessionStorage.getItem('deviceType');
 
 
-    const loadData = () => {
-      if (
-        sessionData &&
-        sessionDataStatus &&
-        sessionDevice &&
-        sessionDeviceType
-      ) {
-        const jsonData = JSON.parse(sessionData);
-        const jsonDataStatus = JSON.parse(sessionDataStatus);
-        this.DeviceType = sessionDeviceType;
-        console.log('sessionDeviceType :-', this.DeviceType);
+    // const loadData = () => {
+    //   if (
+    //     sessionData &&
+    //     sessionDataStatus &&
+    //     sessionDevice &&
+    //     sessionDeviceType
+    //   ) {
+    //     const jsonData = JSON.parse(sessionData);
+    //     const jsonDataStatus = JSON.parse(sessionDataStatus);
+    //     this.DeviceType = sessionDeviceType;
+    //     console.log('sessionDeviceType :-', this.DeviceType);
 
-        // Use setTimeout for the delay
-        setTimeout(() => {
-          this.processChartData(jsonData);
-          this.createDonutChart(jsonDataStatus.dataStatus);
-          this.fetchDeviceInfo(sessionDevice);
-        }, 1000);
-      } else {
-        this.getUserDevices();
-      }
-    };
+    //     // Use setTimeout for the delay
+    //     setTimeout(() => {
+    //       this.processChartData(jsonData);
+    //       this.createDonutChart(jsonDataStatus.dataStatus);
+    //       this.fetchDeviceInfo(sessionDevice);
+    //     }, 1000);
+    //   } else {
+    //     this.getUserDevices();
+    //   }
+    // };
 
-    loadData();
-    this.consuptionData = [
-      { category: 'Category 1', value: 30 },
-      { category: 'Category 2', value: 60 },
-      { category: 'Category 3', value: 80 },
-      { category: 'Category 1', value: 30 },
-      { category: 'Category 2', value: 60 },
-      { category: 'Category 3', value: 80 },
-    ];
+    // loadData();
+    // this.consuptionData = [
+    //   { category: 'Category 1', value: 30 },
+    //   { category: 'Category 2', value: 60 },
+    //   { category: 'Category 3', value: 80 },
+    //   { category: 'Category 1', value: 30 },
+    //   { category: 'Category 2', value: 60 },
+    //   { category: 'Category 3', value: 80 },
+    // ];
   }
 
   getUserDevices() {
@@ -97,7 +105,7 @@ export class DataComponent implements OnInit {
           let deviceType =sessionStorage.getItem('deviceType');
           if((deviceID===null||'') || (deviceType===null||'')){
             this.DashDataService.setDeviceId(this.deviceOptions[0].DeviceUID);
-            this.DashDataService.setInterval('1min');
+            this.DashDataService.setInterval('1hour');
             this.DashDataService.setDeviceType(this.deviceOptions[0].DeviceType);
           }
 
@@ -113,7 +121,7 @@ export class DataComponent implements OnInit {
           // }
         },
         (error) => {
-          this.snackBar.open('Error while fetching user devices!', 'Dismiss', {
+          this.snackBar.open('Error while fetching data!', 'Dismiss', {
             duration: 2000
           });
         }
@@ -123,23 +131,89 @@ export class DataComponent implements OnInit {
 
   retrievingValues(){
     this.DashDataService.deviceID$.subscribe((deviceID) => {
-      console.log(deviceID)
-    });
-    this.DashDataService.deviceType$.subscribe((deviceType) => {
-      console.log(deviceType)
+      this.deviceID=deviceID??'';
     });
     this.DashDataService.interval$.subscribe((interval) => {
-      console.log(interval)
+      this.deviceINTERVAL=interval??'';
     });
     this.DashDataService.StartDate$.subscribe((StartDate) => {
-      console.log(StartDate);
+      this.deviceSTART=StartDate??'';
+      console.log(StartDate)
     });
     this.DashDataService.EndDate$.subscribe((EndDate) => {
-      console.log(EndDate);
+      this.deviceEND=EndDate??'';
+      console.log(EndDate)
+    });
+    this.DashDataService.deviceType$.subscribe((deviceType) => {
+      this.deviceTYPE=deviceType??'';
+      this.retrievingAllValues();
     });
   }
 
- 
+  retrievingAllValues(){
+    if(this.deviceTYPE==='ws'){
+      if(this.deviceINTERVAL==='Custom'){
+        this.DashDataService.getCustomConsumption(this.deviceID,this.deviceSTART,this.deviceEND).subscribe(
+          (WScustom: any) => {
+            console.log(WScustom);
+          },
+          (error) => {
+            console.log('Error while fetching data!');
+          }
+        );
+      }
+      else{
+        this.DashDataService.getIntervalConsuption(this.deviceID,this.deviceINTERVAL).subscribe(
+          (WSinterval: any) => {
+            console.log(WSinterval);
+          },
+          (error) => {
+            console.log('Error while fetching data!');
+          }
+        );
+      }
+    }
+    else if(this.deviceTYPE==='t'||'th'||'ryb'||'fs'){
+      if(this.deviceINTERVAL==='Custom'){
+        this.DashDataService.DataByCustomDate(this.deviceID,this.deviceSTART,this.deviceEND).subscribe(
+          (DataByCustomDate: any) => {
+            console.log(DataByCustomDate);
+          },
+          (error) => {
+            console.log('Error while fetching data!');
+          }
+        );
+
+        this.DashDataService.DataByCustomDateStatus(this.deviceID,this.deviceSTART,this.deviceEND).subscribe(
+          (DataByCustomDateStatus: any) => {
+            console.log(DataByCustomDateStatus);
+          },
+          (error) => {
+            console.log('Error while fetching data!');
+          }
+        );
+      }
+      else{
+        this.DashDataService.dataLast(this.deviceID,this.deviceINTERVAL).subscribe(
+          (dataLast: any) => {
+            console.log(dataLast);
+          },
+          (error) => {
+            console.log('Error while fetching data!');
+          }
+        );
+
+        this.DashDataService.dataLastStatus(this.deviceID,this.deviceINTERVAL).subscribe(
+          (dataLastStatus: any) => {
+            console.log(dataLastStatus);
+          },
+          (error) => {
+            console.log('Error while fetching data!');
+          }
+        );
+      }
+    }
+  } 
 
   createDonutChart(dataStatus: any) {
     const donutChartData = dataStatus.map((entry: any) => {

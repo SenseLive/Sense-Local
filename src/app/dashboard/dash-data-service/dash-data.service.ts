@@ -11,6 +11,8 @@ export class DashDataService {
 
   private deviceIDSubject: BehaviorSubject<string | null>;
   public deviceID$: Observable<string | null>;
+  private deviceNameSubject: BehaviorSubject<string | null>;
+  public deviceName$: Observable<string | null>;
   private intervalSubject: BehaviorSubject<string | null>;
   public interval$: Observable<string | null>;
   private TypeSubject: BehaviorSubject<string | null>;
@@ -23,6 +25,8 @@ export class DashDataService {
   constructor(private http: HttpClient, private router: Router) {
     this.deviceIDSubject = new BehaviorSubject<string | null>(this.getDeviceId());
     this.deviceID$ = this.deviceIDSubject.asObservable();
+    this.deviceNameSubject = new BehaviorSubject<string | null>(this.getDeviceName());
+    this.deviceName$ = this.deviceNameSubject.asObservable();
     this.intervalSubject = new BehaviorSubject<string | null>(this.getInterval());
     this.interval$ = this.intervalSubject.asObservable();
     this.TypeSubject = new BehaviorSubject<string | null>(this.getdeviceType());
@@ -37,11 +41,15 @@ export class DashDataService {
     sessionStorage.setItem('deviceID', deviceID);
     this.deviceIDSubject.next(deviceID);
   }
-  
+
+  setDeviceName(deviceName: string) {
+    sessionStorage.setItem('deviceName', deviceName);
+    this.deviceNameSubject.next(deviceName);
+  }  
 
   setDeviceType(deviceType: string) {
     sessionStorage.setItem('deviceType', deviceType);
-    this.intervalSubject.next(deviceType);
+    this.TypeSubject.next(deviceType);
   }
 
   setInterval(interval: string) {
@@ -61,6 +69,10 @@ export class DashDataService {
 
   getDeviceId(): string | null {
     return sessionStorage.getItem('deviceID');
+  }
+
+  getDeviceName(): string | null {
+    return sessionStorage.getItem('deviceName');
   }
 
   getdeviceType(): string | null {
