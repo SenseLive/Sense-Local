@@ -132,21 +132,19 @@ export class DataComponent implements OnInit {
   retrievingValues(){
     this.DashDataService.deviceID$.subscribe((deviceID) => {
       this.deviceID=deviceID??'';
-    });
-    this.DashDataService.interval$.subscribe((interval) => {
-      this.deviceINTERVAL=interval??'';
-    });
-    this.DashDataService.StartDate$.subscribe((StartDate) => {
-      this.deviceSTART=StartDate??'';
-      console.log(StartDate)
-    });
-    this.DashDataService.EndDate$.subscribe((EndDate) => {
-      this.deviceEND=EndDate??'';
-      console.log(EndDate)
-    });
-    this.DashDataService.deviceType$.subscribe((deviceType) => {
-      this.deviceTYPE=deviceType??'';
-      this.retrievingAllValues();
+      this.DashDataService.deviceType$.subscribe((deviceType) => {
+        this.deviceTYPE=deviceType??'';
+        this.DashDataService.interval$.subscribe((interval) => {
+          this.deviceINTERVAL=interval??'';
+          this.DashDataService.StartDate$.subscribe((StartDate) => {
+            this.deviceSTART=StartDate??'';
+            this.DashDataService.EndDate$.subscribe((EndDate) => {
+              this.deviceEND=EndDate??'';
+              this.retrievingAllValues();
+            });
+          });
+        });
+      });
     });
   }
 

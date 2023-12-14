@@ -136,9 +136,9 @@ export class FilterComponent {
         this.DashDataService.setDeviceName(this.deviceName);
         this.DashDataService.setInterval('Custom');
         this.DashDataService.setDeviceType(this.deviceType);
-        const start = this.datePipe.transform(this.start_date.value, 'M-d-yyyy')!;
+        const start = this.datePipe.transform(this.start_date.value, 'yyyy-M-d')!;
         this.DashDataService.setStartDate(start);
-        const end = this.datePipe.transform(this.end_date.value, 'M-d-yyyy')!;
+        const end = this.datePipe.transform(this.end_date.value, 'yyyy-M-d')!;
         this.DashDataService.setEndDate(end);
       }
       else{
