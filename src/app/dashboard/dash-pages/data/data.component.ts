@@ -45,6 +45,8 @@ export class DataComponent implements OnInit {
   loading1 = true;
 
   ngOnInit() {
+    this.getUserDevices();
+    this.retrievingValues();
     const sessionData = sessionStorage.getItem('data');
     const sessionDataStatus = sessionStorage.getItem('dataStatus');
     const sessionDevice = sessionStorage.getItem('device');
@@ -91,25 +93,53 @@ export class DataComponent implements OnInit {
       this.DashDataService.userDevices(this.CompanyEmail).subscribe(
         (devices: any) => {
           this.deviceOptions = devices.devices;
-          if (this.deviceOptions.length > 0) {
-            this.selectedDevice = this.deviceOptions[0].DeviceUID;
-            this.DeviceType = this.deviceOptions[0].DeviceType;
-            sessionStorage.setItem('device', this.selectedDevice);
-            sessionStorage.setItem('deviceType', this.DeviceType);
-            console.log('Bydefault DeviceType', this.DeviceType);
-
-            this.fetchDefaultData();
-            this.fetchDeviceInfo(this.selectedDevice);
+          let deviceID =sessionStorage.getItem('deviceID');
+          let deviceType =sessionStorage.getItem('deviceType');
+          if((deviceID===null||'') || (deviceType===null||'')){
+            this.DashDataService.setDeviceId(this.deviceOptions[0].DeviceUID);
+            this.DashDataService.setInterval('1min');
+            this.DashDataService.setDeviceType(this.deviceOptions[0].DeviceType);
           }
+
+          // if (this.deviceOptions.length > 0) {
+          //   this.selectedDevice = this.deviceOptions[0].DeviceUID;
+          //   this.DeviceType = this.deviceOptions[0].DeviceType;
+          //   sessionStorage.setItem('device', this.selectedDevice);
+          //   sessionStorage.setItem('deviceType', this.DeviceType);
+          //   console.log('Bydefault DeviceType', this.DeviceType);
+
+          //   this.fetchDefaultData();
+          //   this.fetchDeviceInfo(this.selectedDevice);
+          // }
         },
         (error) => {
           this.snackBar.open('Error while fetching user devices!', 'Dismiss', {
-            duration: 2000,
+            duration: 2000
           });
         }
       );
     }
   }
+
+  retrievingValues(){
+    this.DashDataService.deviceID$.subscribe((deviceID) => {
+      console.log(deviceID)
+    });
+    this.DashDataService.deviceType$.subscribe((deviceType) => {
+      console.log(deviceType)
+    });
+    this.DashDataService.interval$.subscribe((interval) => {
+      console.log(interval)
+    });
+    this.DashDataService.StartDate$.subscribe((StartDate) => {
+      console.log(StartDate);
+    });
+    this.DashDataService.EndDate$.subscribe((EndDate) => {
+      console.log(EndDate);
+    });
+  }
+
+ 
 
   createDonutChart(dataStatus: any) {
     const donutChartData = dataStatus.map((entry: any) => {

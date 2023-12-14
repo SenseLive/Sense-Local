@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Router } from '@angular/router';
 
 
@@ -8,11 +8,80 @@ import { Router } from '@angular/router';
   providedIn: 'root'
 })
 export class DashDataService {
+
+  private deviceIDSubject: BehaviorSubject<string | null>;
+  public deviceID$: Observable<string | null>;
+  private intervalSubject: BehaviorSubject<string | null>;
+  public interval$: Observable<string | null>;
+  private TypeSubject: BehaviorSubject<string | null>;
+  public deviceType$: Observable<string | null>;
+  private StartDateSubject: BehaviorSubject<string | null>;
+  public StartDate$: Observable<string | null>;
+  private EndDateSubject: BehaviorSubject<string | null>;
+  public EndDate$: Observable<string | null>;
+
+  constructor(private http: HttpClient, private router: Router) {
+    this.deviceIDSubject = new BehaviorSubject<string | null>(this.getDeviceId());
+    this.deviceID$ = this.deviceIDSubject.asObservable();
+    this.intervalSubject = new BehaviorSubject<string | null>(this.getInterval());
+    this.interval$ = this.intervalSubject.asObservable();
+    this.TypeSubject = new BehaviorSubject<string | null>(this.getdeviceType());
+    this.deviceType$ = this.TypeSubject.asObservable();
+    this.StartDateSubject = new BehaviorSubject<string | null>(this.getStartDate());
+    this.StartDate$ = this.StartDateSubject.asObservable();
+    this.EndDateSubject = new BehaviorSubject<string | null>(this.getEndDate());
+    this.EndDate$ = this.EndDateSubject.asObservable();
+  }
+
+  setDeviceId(deviceID: string) {
+    sessionStorage.setItem('deviceID', deviceID);
+    this.deviceIDSubject.next(deviceID);
+  }
+  
+
+  setDeviceType(deviceType: string) {
+    sessionStorage.setItem('deviceType', deviceType);
+    this.intervalSubject.next(deviceType);
+  }
+
+  setInterval(interval: string) {
+    sessionStorage.setItem('interval', interval);
+    this.intervalSubject.next(interval);
+  }
+
+  setStartDate(StartDate: string) {
+    sessionStorage.setItem('StartDate', StartDate);
+    this.StartDateSubject.next(StartDate);
+  }
+
+  setEndDate(EndDate: string) {
+    sessionStorage.setItem('EndDate', EndDate);
+    this.EndDateSubject.next(EndDate);
+  }
+
+  getDeviceId(): string | null {
+    return sessionStorage.getItem('deviceID');
+  }
+
+  getdeviceType(): string | null {
+    return sessionStorage.getItem('deviceType');
+  }
+  
+  getInterval(): string | null {
+    return sessionStorage.getItem('interval');
+  }
+
+  getStartDate(): string | null {
+    return sessionStorage.getItem('StartDate');
+  }
+
+  getEndDate(): string | null {
+    return sessionStorage.getItem('EndDate');
+  }
+
   deleteDevice(deviceUid: string) {
     throw new Error('Method not implemented.');
   }
-
-  constructor(private http: HttpClient, private router: Router) {}
 
   //private readonly API_URL = 'http://ec2-13-127-141-210.ap-south-1.compute.amazonaws.com:3000';
   private readonly API_URL = 'http://localhost:3000';

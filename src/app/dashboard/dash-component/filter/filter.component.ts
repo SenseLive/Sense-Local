@@ -15,12 +15,22 @@ export class FilterComponent {
 
   CompanyEmail!: string | null;
   selectedDevice!: FormControl;
-  selectedDeviceType!: any;
-  selectedDeviceInterval!: FormControl;
+  selectedDeviceInterval: string ='';
   deviceOptions: any[] = [];
   selectedRadioButton: string = 'Last';
+  currentDate: Date = new Date();
   startDate!: Date;
-  endDate!: Date;
+  endDate: Date = this.currentDate;
+  start_date = new FormControl('', [Validators.required]);
+  end_date = new FormControl('', [Validators.required]);
+  CompanyId!: string | null;
+  deviceUID!:string;
+  deviceType!:string;
+  
+  presentDeviceID=sessionStorage.getItem('deviceID');
+  presentInterval=sessionStorage.getItem('interval');
+  presentStartDate=sessionStorage.getItem('StartDate');
+  presentEndDate=sessionStorage.getItem('EndDate');
 
   @HostListener('window:resize')
   onWindowResize() {
@@ -37,24 +47,27 @@ export class FilterComponent {
 
   ngOnInit() {
     this.adjustDialogWidth();
-    this.selectedDevice = new FormControl(this.deviceOptions.length > 0 ? this.deviceOptions[0].DeviceUID : '', [Validators.required]);
-    this.selectedDeviceInterval = new FormControl('1hour');
     this.getUserDevices();
+  }
 
-    // Set end date as the current date
-    this.endDate = new Date();
+  open(device: any){
+    this.deviceUID = device.DeviceUID;
+    this.deviceType = device.DeviceType;
+  }
 
-    // Set start date as one day before the current date
-    const oneDay = 24 * 60 * 60 * 1000; // One day in milliseconds
-    const currentDate = new Date();
-    currentDate.setTime(currentDate.getTime() - oneDay);
-    this.startDate = currentDate;
+  updateStartDate(event: any): void {
+    const selectedStartDate = event.value;
+    this.startDate = selectedStartDate;
+  }
 
-    // Subscribe to changes in selectedDevice and update selectedDeviceType
-    this.selectedDevice.valueChanges.subscribe((newDeviceUID) => {
-      const selectedDevice = this.deviceOptions.find(device => device.DeviceUID === newDeviceUID);
-      this.selectedDeviceType = selectedDevice ? selectedDevice.DeviceType : null;
-    });
+  updateEndDate(event: any): void {
+    const selectedEndDate = event.value;
+    if (!this.startDate || selectedEndDate >= this.startDate) {
+      this.endDate = selectedEndDate;
+    } else {
+      this.endDate = this.currentDate;
+      console.error('End date must be greater than or equal to the start date');
+    }
   }
 
   downloadPDF() {
@@ -98,10 +111,6 @@ export class FilterComponent {
       this.DashDataService.userDevices(this.CompanyEmail).subscribe(
         (devices: any) => {
           this.deviceOptions = devices.devices;
-          if (this.deviceOptions.length > 0) {
-            this.selectedDevice.setValue(this.deviceOptions[0].DeviceUID);
-            this.selectedDeviceType = this.deviceOptions[0].DeviceType;
-          }
         },
         (error) => {
           this.snackBar.open('Error while fetching user devices!', 'Dismiss', {
@@ -117,71 +126,17 @@ export class FilterComponent {
   }
 
   onSaveClick(): void {
-    if (this.selectedRadioButton === 'Last') {
-      if (this.selectedDevice.value) {
-        const device = this.selectedDevice.value;
-        const interval = this.selectedDeviceInterval.value;
-        const deviceType = this.selectedDeviceType;
-
-        this.DashDataService.dataLast(device, interval).subscribe(
-          (resultData: any) => {
-            const data = resultData;
-            this.DashDataService.dataLastStatus(device, interval).subscribe(
-              (resultDataStatus: any) => {
-                const dataStatus = resultDataStatus;
-                this.dialogRef.close({ data, dataStatus, device, deviceType });
-              },
-              (error) => {
-                this.snackBar.open('Error while fetching last data status!', 'Dismiss', {
-                  duration: 2000
-                });
-              }
-            );
-          },
-          (error) => {
-            this.snackBar.open('Error while fetching last data!', 'Dismiss', {
-              duration: 2000
-            });
-          }
-        );
-      } else {
-        this.snackBar.open('No device has been selected!', 'Dismiss', {
-          duration: 2000
-        });
-      }
-    } else if (this.selectedRadioButton === 'timePeriod') {
-      if (this.selectedDevice.value) {
-        const device = this.selectedDevice.value;
-        const formattedStartDate = this.startDate.toISOString().split('T')[0];
-        const formattedEndDate = this.endDate.toISOString().split('T')[0];
-        const deviceType = this.selectedDeviceType;
-
-        this.DashDataService.DataByCustomDate(device, formattedStartDate, formattedEndDate).subscribe(
-          (resultData: any) => {
-            const data = resultData;
-            this.DashDataService.DataByCustomDateStatus(device, formattedStartDate, formattedEndDate).subscribe(
-              (resultDataStatus: any) => {
-                const dataStatus = resultDataStatus;
-                this.dialogRef.close({ data, dataStatus, device, deviceType });
-              },
-              (error) => {
-                this.snackBar.open('Error while fetching data status by custom date!', 'Dismiss', {
-                  duration: 2000
-                });
-              }
-            );
-          },
-          (error) => {
-            this.snackBar.open('Error while fetching data by custom date!', 'Dismiss', {
-              duration: 2000
-            });
-          }
-        );
-      } else {
-        this.snackBar.open('No device has been selected!', 'Dismiss', {
-          duration: 2000
-        });
-      }
+    if(this.selectedRadioButton==='Custom' && this.start_date.valid && this.end_date.valid){
+      this.DashDataService.setDeviceId(this.deviceUID);
+      this.DashDataService.setInterval('Custom');
+      this.DashDataService.setDeviceType(this.deviceType);
+      this.DashDataService.setStartDate(this.start_date.value??'');
+      this.DashDataService.setEndDate(this.end_date.value??'');
     }
-  }
+    else{
+      this.DashDataService.setDeviceId(this.deviceUID);
+      this.DashDataService.setInterval(this.selectedDeviceInterval);
+      this.DashDataService.setDeviceType(this.deviceType);
+    }
+  }    
 }
