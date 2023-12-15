@@ -137,6 +137,9 @@ export class FilterComponent {
       this.DashDataService.setDeviceId(this.deviceUID);
       this.DashDataService.setInterval(this.selectedDeviceInterval);
       this.DashDataService.setDeviceType(this.deviceType);
+      this.DashDataService.setStartDate(this.start_date.value??'');
+      this.DashDataService.setEndDate(this.end_date.value??'');
+
     }
   }    
 }

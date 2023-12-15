@@ -8,6 +8,8 @@ import { DashDataService } from '../../dash-data-service/dash-data.service';
 import { AuthService } from '../../../login/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 HighchartsMore(Highcharts);
 
 @Component({
@@ -15,7 +17,9 @@ HighchartsMore(Highcharts);
   templateUrl: './data.component.html',
   styleUrls: ['./data.component.css'],
 })
-export class DataComponent implements OnInit {
+export class DataComponent implements OnInit, OnDestroy {
+
+  private ngUnsubscribe = new Subject<void>();
   constructor(
     public dialog: MatDialog,
     private DashDataService: DashDataService,
@@ -26,7 +30,7 @@ export class DataComponent implements OnInit {
   ) {}
 
   deviceOptions: any[] = [];
-  selectedDevice!: string;
+  selectedDevice!: any;
   selectedDeviceInterval: any = '1hour';
   CompanyEmail!: string | null;
   temperatureData: any[] = [];
@@ -43,6 +47,8 @@ export class DataComponent implements OnInit {
   DeviceLastUpdatedTime!: any;
   DeviceTrigger!: any;
   loading1 = true;
+  selectedStartDate!: any;
+  selectedEndDate!:any;
 
   ngOnInit() {
     this.getUserDevices();
@@ -87,6 +93,12 @@ export class DataComponent implements OnInit {
     ];
   }
 
+  ngOnDestroy(): void {
+    // Complete the subject to ensure all subscriptions are unsubscribed
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+  }
+
   getUserDevices() {
     this.CompanyEmail = this.authService.getCompanyEmail();
     if (this.CompanyEmail) {
@@ -121,22 +133,70 @@ export class DataComponent implements OnInit {
     }
   }
 
-  retrievingValues(){
-    this.DashDataService.deviceID$.subscribe((deviceID) => {
-      console.log(deviceID)
-    });
-    this.DashDataService.deviceType$.subscribe((deviceType) => {
-      console.log(deviceType)
-    });
-    this.DashDataService.interval$.subscribe((interval) => {
-      console.log(interval)
-    });
-    this.DashDataService.StartDate$.subscribe((StartDate) => {
-      console.log(StartDate);
-    });
-    this.DashDataService.EndDate$.subscribe((EndDate) => {
-      console.log(EndDate);
-    });
+  retrievingValues(): void {
+    this.DashDataService.deviceID$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(
+        (deviceID) => {
+          this.selectedDevice = deviceID;
+        },
+        (error) => {
+          console.error('Error retrieving device ID:', error);
+        }
+      );
+
+    this.DashDataService.deviceType$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(
+        (deviceType) => {
+          this.DeviceType = deviceType;
+        },
+        (error) => {
+          console.error('Error retrieving device type:', error);
+        }
+      );
+
+    this.DashDataService.interval$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(
+        (interval) => {
+          this.selectedDeviceInterval = interval;
+        },
+        (error) => {
+          console.error('Error retrieving interval:', error);
+        }
+      );
+
+    this.DashDataService.StartDate$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(
+        (StartDate) => {
+          this.selectedStartDate = StartDate;
+        },
+        (error) => {
+          console.error('Error retrieving start date:', error);
+        }
+      );
+
+    this.DashDataService.EndDate$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(
+        (EndDate) => {
+          this.selectedEndDate = EndDate;
+          this.logValues(); // Log values when all subscriptions are done
+        },
+        (error) => {
+          console.error('Error retrieving end date:', error);
+        }
+      );
+  }
+
+   private logValues(): void {
+    console.log('Selected Device:', this.selectedDevice);
+    console.log('Device Type:', this.DeviceType);
+    console.log('Interval:', this.selectedDeviceInterval);
+    console.log('Start Date:', this.selectedStartDate);
+    console.log('End Date:', this.selectedEndDate);
   }
 
  
