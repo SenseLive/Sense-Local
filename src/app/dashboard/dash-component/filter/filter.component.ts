@@ -15,7 +15,7 @@ import { DatePipe } from '@angular/common';
 export class FilterComponent {
 
   CompanyEmail!: string | null;
-  selectedDevice!: FormControl;
+  selectedDevice!: string;
   selectedDeviceInterval!: string;
   deviceOptions: any[] = [];
   selectedRadioButton: string = 'Last';
@@ -28,11 +28,32 @@ export class FilterComponent {
   deviceUID!:string;
   deviceType!:string;
   deviceName!:string;
-  
-  presentDeviceID=sessionStorage.getItem('deviceID');
-  presentInterval=sessionStorage.getItem('interval');
-  presentStartDate=sessionStorage.getItem('StartDate');
-  presentEndDate=sessionStorage.getItem('EndDate');
+  isOpenFunctionCalled = false;
+
+  id!: string|null;
+  start!: string|null;
+  end!: string|null;
+  cInterval!: string|null;
+
+  defaultData(){    
+    this.id = sessionStorage.getItem('filterDeviceName');
+    this.cInterval = sessionStorage.getItem('filterInterval');
+    if(this.cInterval === 'Custom'){
+      this.selectedRadioButton='Custom';
+      const s = sessionStorage.getItem('filterStartDate');
+      this.start = this.datePipe.transform(s, 'M-d-yyyy')??'';
+      const e = sessionStorage.getItem('FilterEndDate');
+      this.end = this.datePipe.transform(e, 'M-d-yyyy')??'';
+    }
+    else{
+      this.start = '';
+      this.end = '';
+    }
+    this.selectedDevice=this.id??'';
+    this.selectedDeviceInterval = this.cInterval??'';
+    this.start_date.setValue(this.start);
+    this.end_date.setValue(this.end);
+  }
 
   @HostListener('window:resize')
   onWindowResize() {
@@ -51,12 +72,15 @@ export class FilterComponent {
   ngOnInit() {
     this.adjustDialogWidth();
     this.getUserDevices();
+    this.defaultData();
   }
 
   open(device: any){
     this.deviceUID = device.DeviceUID;
     this.deviceType = device.DeviceType;
     this.deviceName = device.DeviceName;
+
+    this.isOpenFunctionCalled = true;
   }
 
   updateStartDate(event: any): void {
@@ -130,29 +154,49 @@ export class FilterComponent {
   }
 
   onSaveClick(): void {
-    if(this.selectedRadioButton==='Custom'){
-      if(this.start_date.valid && this.end_date.valid){
+    if (this.isOpenFunctionCalled) {
+      if(this.selectedRadioButton==='Custom'){
+        if(this.start_date.valid && this.end_date.valid){
+          this.DashDataService.setDeviceId(this.deviceUID);
+          this.DashDataService.setDeviceName(this.deviceName);
+          this.DashDataService.setInterval('Custom');
+          this.DashDataService.setDeviceType(this.deviceType);
+          const start = this.datePipe.transform(this.start_date.value, 'yyyy-M-d')!;
+          this.DashDataService.setStartDate(start);
+          const end = this.datePipe.transform(this.end_date.value, 'yyyy-M-d')!;
+          this.DashDataService.setEndDate(end);
+        }
+        else{
+          console.log("Please Select appropriate values");
+        }      
+      }
+      else if(this.selectedRadioButton==='Last'){
         this.DashDataService.setDeviceId(this.deviceUID);
         this.DashDataService.setDeviceName(this.deviceName);
-        this.DashDataService.setInterval('Custom');
+        this.DashDataService.setInterval(this.selectedDeviceInterval);
         this.DashDataService.setDeviceType(this.deviceType);
-        const start = this.datePipe.transform(this.start_date.value, 'yyyy-M-d')!;
-        this.DashDataService.setStartDate(start);
-        const end = this.datePipe.transform(this.end_date.value, 'yyyy-M-d')!;
-        this.DashDataService.setEndDate(end);
+        this.DashDataService.setStartDate('');
+        this.DashDataService.setEndDate('');
       }
-      else{
-        console.log("Please Select appropriate values");
-      }      
-    }
-    else if(this.selectedRadioButton==='Last'){
-      this.DashDataService.setDeviceId(this.deviceUID);
-      this.DashDataService.setDeviceName(this.deviceName);
-      this.DashDataService.setInterval(this.selectedDeviceInterval);
-      this.DashDataService.setDeviceType(this.deviceType);
-      this.DashDataService.setStartDate('');
-      this.DashDataService.setEndDate('');
-
+    } 
+    else {
+      if(this.selectedRadioButton==='Custom'){
+        if(this.start_date.valid && this.end_date.valid){
+          this.DashDataService.setInterval('Custom');
+          const start = this.datePipe.transform(this.start_date.value, 'yyyy-M-d')!;
+          this.DashDataService.setStartDate(start);
+          const end = this.datePipe.transform(this.end_date.value, 'yyyy-M-d')!;
+          this.DashDataService.setEndDate(end);
+        }
+        else{
+          console.log("Please Select appropriate values");
+        }      
+      }
+      else if(this.selectedRadioButton==='Last'){
+        this.DashDataService.setInterval(this.selectedDeviceInterval);
+        this.DashDataService.setStartDate('');
+        this.DashDataService.setEndDate('');
+      }
     }
   }    
 }
