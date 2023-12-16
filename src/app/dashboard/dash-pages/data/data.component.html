@@ -83,6 +83,19 @@
 				  </mat-card-content>
 				</mat-card>
 			</div>
+
+			<div *ngIf="DeviceType === 'fs'">
+				<mat-card class="mb-2 data-charts">
+				  <mat-card-content>
+				  	<div id="curvedLineChart3" class="chart-container"></div>
+				  </mat-card-content>
+				</mat-card>
+				<mat-card class="mb-2 data-charts">
+				  <mat-card-content>
+				  	<div id="barChart" class="chart-container"></div>
+				  </mat-card-content>
+				</mat-card>
+			</div>
 		</div>
 	</div>
 </section>

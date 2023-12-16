@@ -50,17 +50,12 @@ export class DataComponent implements OnInit{
   // new constants
 
   deviceID!:string;
-  deviceTYPE!:string;
   deviceINTERVAL!:string;
   deviceSTART!:string;
   deviceEND!:string;
 
   ngOnInit() {
-    if(this.deviceID && this.DeviceType && this.deviceINTERVAL){
-      this.retrievingValues();
-    }  else{
-      this.getUserDevices();
-    }
+    this.retrievingValues();
   }
 
   getUserDevices() {
@@ -74,9 +69,16 @@ export class DataComponent implements OnInit{
             this.deviceID = this.deviceOptions[0].DeviceUID;
             this.DeviceType = this.deviceOptions[0].DeviceType;
             this.deviceINTERVAL = '1hour';
+            this.DashDataService.setDeviceId(this.deviceID);
+            this.DashDataService.setDeviceType(this.DeviceType);
+            this.DashDataService.setInterval(this.deviceINTERVAL);
 
-            this.retrievingAllValues();
-            this.fetchDeviceInfo(this.deviceID);
+            setTimeout(() => {
+              this.retrievingAllValues();
+              this.fetchDeviceInfo(this.deviceID);
+              this.router.navigate([this.router.url]);
+            }, 1000);
+            
           }
         },
         (error) => {
@@ -89,17 +91,26 @@ export class DataComponent implements OnInit{
   }
 
   retrievingValues(){
+    console.log('Page geets Intailize andd theenn fetchingg tthee data');
     this.deviceID = this.DashDataService.getDeviceId() || '';
     this.DeviceType = this.DashDataService.getDeviceType() || '';
     this.deviceINTERVAL = this.DashDataService.getInterval() || '';
     this.deviceSTART = this.DashDataService.getStartDate() || '';
-    this.deviceEND = this.DashDataService.getEndDate() || ''; 
-    console.log(this.deviceID, this.DeviceType, this.deviceINTERVAL);
-    this.retrievingAllValues();
+    this.deviceEND = this.DashDataService.getEndDate() || '';
+    setTimeout(() => { 
+      if(this.deviceID && this.DeviceType && this.deviceINTERVAL){
+        console.log("Device UID", this.deviceID, "DeviceType:-", this.DeviceType, "Device Inteerval", this.deviceINTERVAL);
+        this.retrievingAllValues();
+      }  else{
+        this.getUserDevices();
+        console.log("device data is not found");
+      }
+    }, 1000);
   }
 
   retrievingAllValues(){
-    if(this.deviceTYPE==='ws'||'fs'){
+    console.log(this.DeviceType);
+    if(this.DeviceType==='ws'|| this.DeviceType==='fs'){
       if(this.deviceINTERVAL==='Custom'){
         this.DashDataService.getCustomConsumption(this.deviceID,this.deviceSTART,this.deviceEND).subscribe(
           (dataWS: any) => {
@@ -162,7 +173,7 @@ export class DataComponent implements OnInit{
         );
       }
     }
-    else if(this.deviceTYPE==='t'||'th'||'ryb'){
+    else if(this.DeviceType==='t'||this.DeviceType==='th'||this.DeviceType==='ryb'){
       if(this.deviceINTERVAL==='Custom'){
         this.DashDataService.DataByCustomDate(this.deviceID,this.deviceSTART,this.deviceEND).subscribe(
           (data: any) => {
@@ -513,8 +524,8 @@ export class DataComponent implements OnInit{
               y2: 1,
             },
             stops: [
-              [0, 'rgba(255, 0, 0, 1)'], // Start color (red)
-              [1, 'rgba(255, 255, 0, 0.3)'], // End color (yellow)
+              [0, 'rgba(0, 0, 255, 1)'], // Start color (blue)
+              [1, 'rgba(0, 255, 255, 0.3)'], // End color (yellow)
             ],
           },
           data: this.consumptionData, // Specify the temperature values for each category

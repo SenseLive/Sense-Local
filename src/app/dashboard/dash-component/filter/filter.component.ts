@@ -49,6 +49,7 @@ export class FilterComponent {
   ) {}
 
   ngOnInit() {
+    
     this.adjustDialogWidth();
     this.getUserDevices();
   }
@@ -140,6 +141,7 @@ export class FilterComponent {
         this.DashDataService.setStartDate(start);
         const end = this.datePipe.transform(this.end_date.value, 'yyyy-M-d')!;
         this.DashDataService.setEndDate(end);
+        this.dialogRef.close();
       }
       else{
         console.log("Please Select appropriate values");
@@ -152,7 +154,7 @@ export class FilterComponent {
       this.DashDataService.setDeviceType(this.deviceType);
       this.DashDataService.setStartDate('');
       this.DashDataService.setEndDate('');
-
-    }
+      this.dialogRef.close();
+    } 
   }    
 }
