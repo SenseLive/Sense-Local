@@ -263,7 +263,7 @@ export class TempComponent implements OnInit, OnDestroy {
 
               // Find the corresponding device in consumptionData array
               const deviceInfoObject = this.consumptionData.find(device => device.DeviceUID === deviceInfo);
-
+              
               if (deviceInfoObject) {
                 // Calculate percentage change for monthly consumption
                 const thisMonth = consumptionData.thisMonth;

@@ -5,6 +5,7 @@ import { DashDataService } from '../../dash-data-service/dash-data.service';
 import { AuthService } from '../../../login/auth/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import 'jspdf-autotable';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-filter',
@@ -15,7 +16,7 @@ export class FilterComponent {
 
   CompanyEmail!: string | null;
   selectedDevice!: FormControl;
-  selectedDeviceInterval: string ='';
+  selectedDeviceInterval!: string;
   deviceOptions: any[] = [];
   selectedRadioButton: string = 'Last';
   currentDate: Date = new Date();
@@ -26,6 +27,7 @@ export class FilterComponent {
   CompanyId!: string | null;
   deviceUID!:string;
   deviceType!:string;
+  deviceName!:string;
   
   presentDeviceID=sessionStorage.getItem('deviceID');
   presentInterval=sessionStorage.getItem('interval');
@@ -42,7 +44,8 @@ export class FilterComponent {
     private authService: AuthService,
     public snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<FilterComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    @Inject(MAT_DIALOG_DATA) public data: any,
+    private datePipe: DatePipe
   ) {}
 
   ngOnInit() {
@@ -53,6 +56,7 @@ export class FilterComponent {
   open(device: any){
     this.deviceUID = device.DeviceUID;
     this.deviceType = device.DeviceType;
+    this.deviceName = device.DeviceName;
   }
 
   updateStartDate(event: any): void {
@@ -126,19 +130,28 @@ export class FilterComponent {
   }
 
   onSaveClick(): void {
-    if(this.selectedRadioButton==='Custom' && this.start_date.valid && this.end_date.valid){
-      this.DashDataService.setDeviceId(this.deviceUID);
-      this.DashDataService.setInterval('Custom');
-      this.DashDataService.setDeviceType(this.deviceType);
-      this.DashDataService.setStartDate(this.start_date.value??'');
-      this.DashDataService.setEndDate(this.end_date.value??'');
+    if(this.selectedRadioButton==='Custom'){
+      if(this.start_date.valid && this.end_date.valid){
+        this.DashDataService.setDeviceId(this.deviceUID);
+        this.DashDataService.setDeviceName(this.deviceName);
+        this.DashDataService.setInterval('Custom');
+        this.DashDataService.setDeviceType(this.deviceType);
+        const start = this.datePipe.transform(this.start_date.value, 'yyyy-M-d')!;
+        this.DashDataService.setStartDate(start);
+        const end = this.datePipe.transform(this.end_date.value, 'yyyy-M-d')!;
+        this.DashDataService.setEndDate(end);
+      }
+      else{
+        console.log("Please Select appropriate values");
+      }      
     }
-    else{
+    else if(this.selectedRadioButton==='Last'){
       this.DashDataService.setDeviceId(this.deviceUID);
+      this.DashDataService.setDeviceName(this.deviceName);
       this.DashDataService.setInterval(this.selectedDeviceInterval);
       this.DashDataService.setDeviceType(this.deviceType);
-      this.DashDataService.setStartDate(this.start_date.value??'');
-      this.DashDataService.setEndDate(this.end_date.value??'');
+      this.DashDataService.setStartDate('');
+      this.DashDataService.setEndDate('');
 
     }
   }    

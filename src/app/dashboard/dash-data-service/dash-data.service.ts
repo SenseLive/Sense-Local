@@ -9,74 +9,87 @@ import { Router } from '@angular/router';
 })
 export class DashDataService {
 
-  private deviceIDSubject: BehaviorSubject<string | null>;
-  public deviceID$: Observable<string | null>;
-  private intervalSubject: BehaviorSubject<string | null>;
-  public interval$: Observable<string | null>;
-  private TypeSubject: BehaviorSubject<string | null>;
-  public deviceType$: Observable<string | null>;
-  private StartDateSubject: BehaviorSubject<string | null>;
-  public StartDate$: Observable<string | null>;
-  private EndDateSubject: BehaviorSubject<string | null>;
-  public EndDate$: Observable<string | null>;
+  // private deviceIDSubject: BehaviorSubject<string | null>;
+  // public deviceID$: Observable<string | null>;
+  // private deviceNameSubject: BehaviorSubject<string | null>;
+  // public deviceName$: Observable<string | null>;
+  // private intervalSubject: BehaviorSubject<string | null>;
+  // public interval$: Observable<string | null>;
+  // private TypeSubject: BehaviorSubject<string | null>;
+  // public deviceType$: Observable<string | null>;
+  // private StartDateSubject: BehaviorSubject<string | null>;
+  // public StartDate$: Observable<string | null>;
+  // private EndDateSubject: BehaviorSubject<string | null>;
+  // public EndDate$: Observable<string | null>;
 
   constructor(private http: HttpClient, private router: Router) {
-    this.deviceIDSubject = new BehaviorSubject<string | null>(this.getDeviceId());
-    this.deviceID$ = this.deviceIDSubject.asObservable();
-    this.intervalSubject = new BehaviorSubject<string | null>(this.getInterval());
-    this.interval$ = this.intervalSubject.asObservable();
-    this.TypeSubject = new BehaviorSubject<string | null>(this.getdeviceType());
-    this.deviceType$ = this.TypeSubject.asObservable();
-    this.StartDateSubject = new BehaviorSubject<string | null>(this.getStartDate());
-    this.StartDate$ = this.StartDateSubject.asObservable();
-    this.EndDateSubject = new BehaviorSubject<string | null>(this.getEndDate());
-    this.EndDate$ = this.EndDateSubject.asObservable();
+    // this.deviceIDSubject = new BehaviorSubject<string | null>(this.getDeviceId());
+    // this.deviceID$ = this.deviceIDSubject.asObservable();
+    // this.deviceNameSubject = new BehaviorSubject<string | null>(this.getDeviceName());
+    // this.deviceName$ = this.deviceNameSubject.asObservable();
+    // this.intervalSubject = new BehaviorSubject<string | null>(this.getInterval());
+    // this.interval$ = this.intervalSubject.asObservable();
+    // this.TypeSubject = new BehaviorSubject<string | null>(this.getdeviceType());
+    // this.deviceType$ = this.TypeSubject.asObservable();
+    // this.StartDateSubject = new BehaviorSubject<string | null>(this.getStartDate());
+    // this.StartDate$ = this.StartDateSubject.asObservable();
+    // this.EndDateSubject = new BehaviorSubject<string | null>(this.getEndDate());
+    // this.EndDate$ = this.EndDateSubject.asObservable();
   }
 
   setDeviceId(deviceID: string) {
-    sessionStorage.setItem('deviceID', deviceID);
-    this.deviceIDSubject.next(deviceID);
-  }
-  
-
-  setDeviceType(deviceType: string) {
-    sessionStorage.setItem('deviceType', deviceType);
-    this.intervalSubject.next(deviceType);
-  }
-
-  setInterval(interval: string) {
-    sessionStorage.setItem('interval', interval);
-    this.intervalSubject.next(interval);
-  }
-
-  setStartDate(StartDate: string) {
-    sessionStorage.setItem('StartDate', StartDate);
-    this.StartDateSubject.next(StartDate);
-  }
-
-  setEndDate(EndDate: string) {
-    sessionStorage.setItem('EndDate', EndDate);
-    this.EndDateSubject.next(EndDate);
+    sessionStorage.setItem('filterDeviceID', deviceID);
+    //this.deviceIDSubject.next(deviceID);
   }
 
   getDeviceId(): string | null {
-    return sessionStorage.getItem('deviceID');
+    return sessionStorage.getItem('filterDeviceID');
   }
 
-  getdeviceType(): string | null {
-    return sessionStorage.getItem('deviceType');
+  setDeviceName(deviceName: string) {
+    sessionStorage.setItem('filterDeviceName', deviceName);
+    //this.deviceNameSubject.next(deviceName);
+  }  
+
+  getDeviceName(): string | null {
+    return sessionStorage.getItem('filterDeviceName');
   }
-  
+
+  setDeviceType(deviceType: string) {
+    sessionStorage.setItem('filterDeviceType', deviceType);
+    //this.TypeSubject.next(deviceType);
+  }
+
+  getDeviceType(): string | null {
+    return sessionStorage.getItem('filterDeviceType');
+  }
+
+
+  setInterval(interval: string) {
+    sessionStorage.setItem('filterInterval', interval);
+    //this.intervalSubject.next(interval);
+  }
+
   getInterval(): string | null {
-    return sessionStorage.getItem('interval');
+    return sessionStorage.getItem('filterInterval');
+  }
+
+  setStartDate(StartDate: string) {
+    sessionStorage.setItem('filterStartDate', StartDate);
+    //this.StartDateSubject.next(StartDate);
   }
 
   getStartDate(): string | null {
-    return sessionStorage.getItem('StartDate');
+    return sessionStorage.getItem('filterStartDate');
+  }
+
+  setEndDate(EndDate: string) {
+    sessionStorage.setItem('FilterEndDate', EndDate);
+   //this.EndDateSubject.next(EndDate);
   }
 
   getEndDate(): string | null {
-    return sessionStorage.getItem('EndDate');
+    return sessionStorage.getItem('FilterEndDate');
   }
 
   deleteDevice(deviceUid: string) {
@@ -187,7 +200,7 @@ export class DashDataService {
   }
   
   getIntervalConsuption( deviceId : string, duration: any ): Observable <any>{
-    return this.http.get(`${this.API_URL}/ConsuptionByIntervalBar/${deviceId}?duration=${duration}`);
+    return this.http.get(`${this.API_URL}/ConsuptionByIntervalBar/${deviceId}?interval=${duration}`);
   }
 
   getCustomConsumption(deviceId: string, startDate:any, endDate: any): Observable <any>{
