@@ -113,7 +113,6 @@ export class AddDeviceComponent implements OnInit{
     if(this.userId){
       this.DashDataService.userDetails(this.userId).subscribe(
         (users) => {
-          console.log(users);
           this.CompanyEmail = users[0].CompanyEmail;
           this.CompanyName = users[0].CompanyName;
           this.UserType = users[0].UserType;

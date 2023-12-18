@@ -69,9 +69,11 @@ export class DataComponent implements OnInit{
             this.deviceID = this.deviceOptions[0].DeviceUID;
             this.DeviceType = this.deviceOptions[0].DeviceType;
             this.deviceINTERVAL = '1hour';
+            this.DeviceName = this.deviceOptions[0].DeviceName;
             this.DashDataService.setDeviceId(this.deviceID);
             this.DashDataService.setDeviceType(this.DeviceType);
             this.DashDataService.setInterval(this.deviceINTERVAL);
+            this.DashDataService.setDeviceName(this.DeviceName);
 
             setTimeout(() => {
               this.retrievingAllValues();
@@ -91,7 +93,6 @@ export class DataComponent implements OnInit{
   }
 
   retrievingValues(){
-    console.log('Page geets Intailize andd theenn fetchingg tthee data');
     this.deviceID = this.DashDataService.getDeviceId() || '';
     this.DeviceType = this.DashDataService.getDeviceType() || '';
     this.deviceINTERVAL = this.DashDataService.getInterval() || '';
@@ -99,17 +100,14 @@ export class DataComponent implements OnInit{
     this.deviceEND = this.DashDataService.getEndDate() || '';
     setTimeout(() => { 
       if(this.deviceID && this.DeviceType && this.deviceINTERVAL){
-        console.log("Device UID", this.deviceID, "DeviceType:-", this.DeviceType, "Device Inteerval", this.deviceINTERVAL);
         this.retrievingAllValues();
       }  else{
         this.getUserDevices();
-        console.log("device data is not found");
       }
     }, 1000);
   }
 
   retrievingAllValues(){
-    console.log(this.DeviceType);
     if(this.DeviceType==='ws'|| this.DeviceType==='fs'){
       if(this.deviceINTERVAL==='Custom'){
         this.DashDataService.getCustomConsumption(this.deviceID,this.deviceSTART,this.deviceEND).subscribe(
@@ -122,23 +120,29 @@ export class DataComponent implements OnInit{
                       this.processChartData(data);
                       this.createDonutChart(dataStatus.dataStatus);
                       this.fetchDeviceInfo(this.deviceID);
+                      console.log(dataWS);
                       this.processChartDataWS(dataWS);
                       this.router.navigate([this.router.url]);
                     }, 1000);
-                    console.log(dataWS);
                   },
                   (error) => {
-                    console.log('Error while fetching data!');
+                    this.snackBar.open('Error while fetching data!', 'Dismiss', {
+                      duration: 2000
+                    });
                   }
                 );
               },
               (error) => {
-                console.log('Error while fetching data!');
+                this.snackBar.open('Error while fetching data!', 'Dismiss', {
+                  duration: 2000
+                });
               }
             );
           },
           (error) => {
-            console.log('Error while fetching data!');
+            this.snackBar.open('Error while fetching data!', 'Dismiss', {
+              duration: 2000
+            });
           }
         );
       }
@@ -153,22 +157,29 @@ export class DataComponent implements OnInit{
                       this.processChartData(data);
                       this.createDonutChart(dataStatus.dataStatus);
                       this.fetchDeviceInfo(this.deviceID);
+                      console.log(dataWS);
                       this.processChartDataWS(dataWS);
                       this.router.navigate([this.router.url]);
                     }, 1000);
                   },
                   (error) => {
-                    console.log('Error while fetching data!');
+                    this.snackBar.open('Error while fetching data!', 'Dismiss', {
+                      duration: 2000
+                    });
                   }
                 );
               },
               (error) => {
-                console.log('Error while fetching data!');
+                this.snackBar.open('Error while fetching data!', 'Dismiss', {
+                  duration: 2000
+                });
               }
             );
           },
           (error) => {
-            console.log('Error while fetching data!');
+            this.snackBar.open('Error while fetching data!', 'Dismiss', {
+              duration: 2000
+            });
           }
         );
       }
@@ -187,12 +198,16 @@ export class DataComponent implements OnInit{
                 }, 1000);
               },
               (error) => {
-                console.log('Error while fetching data!');
+                this.snackBar.open('Error while fetching data!', 'Dismiss', {
+                  duration: 2000
+                });
               }
             );
           },
           (error) => {
-            console.log('Error while fetching data!');
+            this.snackBar.open('Error while fetching data!', 'Dismiss', {
+              duration: 2000
+            });
           }
         );      
       }
@@ -209,12 +224,16 @@ export class DataComponent implements OnInit{
                 }, 1000);
               },
               (error) => {
-                console.log('Error while fetching data!');
+                this.snackBar.open('Error while fetching data!', 'Dismiss', {
+                  duration: 2000
+                });
               }
             );
           },
           (error) => {
-            console.log('Error while fetching data!');
+            this.snackBar.open('Error while fetching data!', 'Dismiss', {
+              duration: 2000
+            });
           }
         ); 
       }
@@ -263,8 +282,6 @@ export class DataComponent implements OnInit{
         time: time,
       };
     });
-
-    console.log(donutChartData);
 
     const options: Highcharts.Options = {
       chart: {
@@ -548,7 +565,6 @@ export class DataComponent implements OnInit{
   }
 
   processChartData(response: any) {
-    console.log(response);
     const data = response.data;
     const istOffset = 5.5 * 60 * 60 * 1000; // IST offset: +5:30 in milliseconds
 
@@ -598,12 +614,13 @@ export class DataComponent implements OnInit{
       this.createChart3();
       this.createBarGraph();
     } else {
-      console.log('Device Type is not found!');
+      this.snackBar.open('Device Type is not found!', 'Dismiss', {
+        duration: 2000
+      });
     }
   }
 
   processChartDataWS(response: any) {
-    console.log(response);
     const data = response.data;
     const istOffset = 5.5 * 60 * 60 * 1000; // IST offset: +5:30 in milliseconds
 
@@ -613,25 +630,6 @@ export class DataComponent implements OnInit{
     ]);
 
     this.createBarGraph();
-    console.log(this.consumptionData);
-    // this.timestampData = data.map(
-    //   (entry: any) => new Date(entry.TimeStamp).getTime() + istOffset
-    // );
-
-
-    // if (this.DeviceType === 'th') {
-    //   this.createChart();
-    //   this.createChart2();
-    // } else if (this.DeviceType === 't') {
-    //   this.createChart();
-    // } else if (this.DeviceType === 'ryb') {
-    //   this.createTemperature();
-    // } else if (this.DeviceType === 'ws') {
-    //   this.createChart3();
-    //   this.createBarGraph();
-    // } else {
-    //   console.log('Device Type is not found!');
-    // }
   }
 
   fetchDeviceInfo(deviceId: string) {

@@ -18,7 +18,7 @@ export class FilterComponent {
   selectedDevice!: FormControl;
   selectedDeviceInterval!: string;
   deviceOptions: any[] = [];
-  selectedRadioButton: string = 'Last';
+  selectedRadioButton!: string;
   currentDate: Date = new Date();
   startDate!: Date;
   endDate: Date = this.currentDate;
@@ -28,11 +28,8 @@ export class FilterComponent {
   deviceUID!:string;
   deviceType!:string;
   deviceName!:string;
+  deviceInterval!:string;
   
-  presentDeviceID=sessionStorage.getItem('deviceID');
-  presentInterval=sessionStorage.getItem('interval');
-  presentStartDate=sessionStorage.getItem('StartDate');
-  presentEndDate=sessionStorage.getItem('EndDate');
 
   @HostListener('window:resize')
   onWindowResize() {
@@ -49,7 +46,17 @@ export class FilterComponent {
   ) {}
 
   ngOnInit() {
-    
+    this.deviceUID = this.DashDataService.getDeviceId() || '';
+    this.deviceName = this.DashDataService.getDeviceName() || '';
+    this.deviceInterval = this.DashDataService.getInterval() || '';
+    if(this.deviceUID && this.deviceName && this.deviceInterval){
+      if(this.deviceInterval === "Custom"){
+        this.selectedRadioButton = 'Custom';
+      } else{
+        this.selectedRadioButton = 'Last';
+        this.selectedDeviceInterval = this.deviceInterval;
+      }
+    }
     this.adjustDialogWidth();
     this.getUserDevices();
   }
@@ -144,7 +151,9 @@ export class FilterComponent {
         this.dialogRef.close();
       }
       else{
-        console.log("Please Select appropriate values");
+        this.snackBar.open('Please Select appropriate values!', 'Dismiss', {
+          duration: 2000
+        });
       }      
     }
     else if(this.selectedRadioButton==='Last'){

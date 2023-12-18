@@ -9,37 +9,11 @@ import { Router } from '@angular/router';
 })
 export class DashDataService {
 
-  // private deviceIDSubject: BehaviorSubject<string | null>;
-  // public deviceID$: Observable<string | null>;
-  // private deviceNameSubject: BehaviorSubject<string | null>;
-  // public deviceName$: Observable<string | null>;
-  // private intervalSubject: BehaviorSubject<string | null>;
-  // public interval$: Observable<string | null>;
-  // private TypeSubject: BehaviorSubject<string | null>;
-  // public deviceType$: Observable<string | null>;
-  // private StartDateSubject: BehaviorSubject<string | null>;
-  // public StartDate$: Observable<string | null>;
-  // private EndDateSubject: BehaviorSubject<string | null>;
-  // public EndDate$: Observable<string | null>;
-
   constructor(private http: HttpClient, private router: Router) {
-    // this.deviceIDSubject = new BehaviorSubject<string | null>(this.getDeviceId());
-    // this.deviceID$ = this.deviceIDSubject.asObservable();
-    // this.deviceNameSubject = new BehaviorSubject<string | null>(this.getDeviceName());
-    // this.deviceName$ = this.deviceNameSubject.asObservable();
-    // this.intervalSubject = new BehaviorSubject<string | null>(this.getInterval());
-    // this.interval$ = this.intervalSubject.asObservable();
-    // this.TypeSubject = new BehaviorSubject<string | null>(this.getdeviceType());
-    // this.deviceType$ = this.TypeSubject.asObservable();
-    // this.StartDateSubject = new BehaviorSubject<string | null>(this.getStartDate());
-    // this.StartDate$ = this.StartDateSubject.asObservable();
-    // this.EndDateSubject = new BehaviorSubject<string | null>(this.getEndDate());
-    // this.EndDate$ = this.EndDateSubject.asObservable();
   }
 
   setDeviceId(deviceID: string) {
     sessionStorage.setItem('filterDeviceID', deviceID);
-    //this.deviceIDSubject.next(deviceID);
   }
 
   getDeviceId(): string | null {
@@ -48,7 +22,6 @@ export class DashDataService {
 
   setDeviceName(deviceName: string) {
     sessionStorage.setItem('filterDeviceName', deviceName);
-    //this.deviceNameSubject.next(deviceName);
   }  
 
   getDeviceName(): string | null {
@@ -57,7 +30,6 @@ export class DashDataService {
 
   setDeviceType(deviceType: string) {
     sessionStorage.setItem('filterDeviceType', deviceType);
-    //this.TypeSubject.next(deviceType);
   }
 
   getDeviceType(): string | null {
@@ -67,7 +39,6 @@ export class DashDataService {
 
   setInterval(interval: string) {
     sessionStorage.setItem('filterInterval', interval);
-    //this.intervalSubject.next(interval);
   }
 
   getInterval(): string | null {
@@ -76,7 +47,6 @@ export class DashDataService {
 
   setStartDate(StartDate: string) {
     sessionStorage.setItem('filterStartDate', StartDate);
-    //this.StartDateSubject.next(StartDate);
   }
 
   getStartDate(): string | null {
@@ -85,7 +55,6 @@ export class DashDataService {
 
   setEndDate(EndDate: string) {
     sessionStorage.setItem('FilterEndDate', EndDate);
-   //this.EndDateSubject.next(EndDate);
   }
 
   getEndDate(): string | null {
