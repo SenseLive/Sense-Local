@@ -56,6 +56,7 @@ export class DataComponent implements OnInit{
 
   ngOnInit() {
     this.retrievingValues();
+    console.log("Intial Page!!");
   }
 
   getUserDevices() {
@@ -98,16 +99,20 @@ export class DataComponent implements OnInit{
     this.deviceINTERVAL = this.DashDataService.getInterval() || '';
     this.deviceSTART = this.DashDataService.getStartDate() || '';
     this.deviceEND = this.DashDataService.getEndDate() || '';
+    console.log(this.deviceID, this.DeviceType, this.deviceINTERVAL);
     setTimeout(() => { 
       if(this.deviceID && this.DeviceType && this.deviceINTERVAL){
         this.retrievingAllValues();
+        console.log("retriving from Stored!");
       }  else{
         this.getUserDevices();
+        console.log("retriving FRom defualt!!");
       }
     }, 1000);
   }
 
   retrievingAllValues(){
+    console.log(this.DeviceType);
     if(this.DeviceType==='ws'|| this.DeviceType==='fs'){
       if(this.deviceINTERVAL==='Custom'){
         this.DashDataService.getCustomConsumption(this.deviceID,this.deviceSTART,this.deviceEND).subscribe(
