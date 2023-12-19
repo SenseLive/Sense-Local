@@ -4,20 +4,18 @@ import { EditDeviceComponent } from '../../dash-component/edit-device/edit-devic
 import { TriggerDeviceComponent } from '../../dash-component/trigger-device/trigger-device.component';
 import { DashDataService } from '../../dash-data-service/dash-data.service';
 import { AuthService } from '../../../login/auth/auth.service';
-import { Subscription } from 'rxjs';
-import { MqttService, IMqttMessage, MqttConnectionState  } from 'ngx-mqtt';
 import{ DashService } from '../../dash.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { interval } from 'rxjs';
 
 @Component({
   selector: 'app-temp',
   templateUrl: './temp.component.html',
   styleUrls: ['./temp.component.css']
 })
-export class TempComponent implements OnInit, OnDestroy {
+export class TempComponent implements OnInit {
   userDevices: any[] = [];
   CompanyEmail!: string | null; 
-  mqttSubscriptions: Subscription[] = [];
   deviceData: any[] = [];
   userDevicesTrigger: any[] = [];
   consumptionData: any[] = [];
@@ -26,16 +24,9 @@ export class TempComponent implements OnInit, OnDestroy {
     public dialog: MatDialog,
     private dashDataService: DashDataService,
     private authService: AuthService,
-    private mqttService: MqttService,
     public dashService: DashService,
     public snackBar: MatSnackBar,
   ) {
-    const connectionSubscription: Subscription = this.mqttService.state.subscribe((state: MqttConnectionState) => {
-    if (state === MqttConnectionState.CONNECTED) {
-      // // Connection has been established
-      // console.log('MQTT Connection Established!');
-    }
-  });
   }
 
 
@@ -43,13 +34,8 @@ export class TempComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.getUserDevices();
     this.getUserDevicesTrigger();
-    this.TodayConsumption();
-    this.MonthConsumption();
+    this.CombinedConsumption();
     this.dashService.isPageLoading(true);
-  }
-
-  ngOnDestroy() {
-    this.unsubscribeFromTopics();
   }
 
   getUserType(): string | null {
@@ -62,8 +48,11 @@ export class TempComponent implements OnInit, OnDestroy {
       this.dashDataService.userDevices(this.CompanyEmail).subscribe(
         (devices: any) => {
           this.userDevices = devices.devices;
-          this.subscribeToTopics();
-          this.dashService.isPageLoading(false);
+          this.getDeviceData();
+
+          interval(60 * 1000).subscribe(() => {
+            this.getDeviceData();
+          });
         },
         (error) => {
           this.snackBar.open('Error while fetching user devices!', 'Dismiss', {
@@ -112,33 +101,51 @@ export class TempComponent implements OnInit, OnDestroy {
     });
   }
 
-  subscribeToTopics() {
-    this.deviceData = [];
-    this.userDevices.forEach(device => {
-      const topic = `Sense/Live/${device.DeviceUID}`;
-      const subscription = this.mqttService.observe(topic).subscribe((message: IMqttMessage) => {
-        const payload = message.payload.toString();
-        const deviceData = JSON.parse(payload);
-
-
-        deviceData.Timestamp = new Date();
-
-        const index = this.userDevices.findIndex(d => d.DeviceUID === device.DeviceUID);
-        if (index !== -1) {
-          this.deviceData[index] = deviceData;
+  getDeviceData(){
+    if(this.CompanyEmail){
+      this.dashDataService.getDeviceData(this.CompanyEmail).subscribe(
+        (deviceData) =>{
+          this.deviceData = this.transformData(deviceData);
+          this.dashService.isPageLoading(false);
+        },
+        (error) =>{
+          console.log("Error");
         }
-      });
-
-      this.mqttSubscriptions.push(subscription);
-    });
+      );
+    }
   }
 
-  unsubscribeFromTopics() {
-    this.mqttSubscriptions.forEach(subscription => {
-      subscription.unsubscribe();
+  transformData(data: any): any[] {
+    const transformedData: any[] = [];
+
+    data.latestEntry.forEach((deviceEntry: any) => {
+      const deviceUID = Object.keys(deviceEntry)[0];
+      const entryData = deviceEntry[deviceUID]?.entry?.[0];
+
+      if (entryData) {
+        const timestampUTC = new Date(entryData.TimeStamp);
+        const timestampIST = new Date(timestampUTC.getTime() + (5.5 * 60 * 60 * 1000)); // Add 5.30 hours
+
+        const transformedEntry: any = {
+          DeviceUID: deviceUID,
+          TemperatureR: entryData.TemperatureR ? parseFloat(entryData.TemperatureR) : undefined,
+          TemperatureY: entryData.TemperatureY ? parseFloat(entryData.TemperatureY) : undefined,
+          TemperatureB: entryData.TemperatureB ? parseFloat(entryData.TemperatureB) : undefined,
+          flowRate: entryData.flowRate ? parseInt(entryData.flowRate) : undefined,
+          totalVolume: entryData.totalVolume ? parseInt(entryData.totalVolume) : undefined,
+          Timestamp: timestampIST.toISOString() // Convert back to ISO string
+        };
+
+        transformedData.push(transformedEntry);
+      } else {
+        console.error(`Entry data not found for device UID: ${deviceUID}`);
+      }
     });
-    this.mqttSubscriptions = [];
+
+    return transformedData;
   }
+
+
 
   getIndex(deviceUid: string): number {
     return this.userDevices.findIndex(device => device.DeviceUID === deviceUid);
@@ -205,96 +212,71 @@ export class TempComponent implements OnInit, OnDestroy {
     return this.consumptionData.findIndex(device => device.DeviceUID === deviceUid);
   }
 
-  TodayConsumption() {
+  CombinedConsumption() {
     if (this.CompanyEmail) {
       this.dashDataService.getTodayConsumption(this.CompanyEmail).subscribe(
-        (data: any[]) => {
-          // Assuming data is an array of devices
+        (todayData: any[]) => {
           this.consumptionData = [];
 
-          // Loop through each device
-          data.forEach(deviceData => {
-            const deviceInfo = Object.keys(deviceData)[0]; // Assuming each object has only one key
+          // Loop through each device for today's consumption
+          todayData.forEach((dailyConsumptionData, index) => {
+            const deviceInfo = Object.keys(dailyConsumptionData)[0];
+            const today = dailyConsumptionData[deviceInfo][0].today;
+            const yesterday = dailyConsumptionData[deviceInfo][0].yesterday;
 
-            // Get consumption data for the device
-            const consumptionData = deviceData[deviceInfo][0];
+            // Calculate daily percentage change
+            let dailyPercentageChange: number;
+            if (yesterday !== 0) {
+              dailyPercentageChange = ((today - yesterday) / yesterday) * 100;
+            } else {
+              dailyPercentageChange = 100;
+            }
 
-            // Calculate percentage change
-            const today = consumptionData.today;
-            const yesterday = consumptionData.yesterday;
-            let percentageChange;
-            // Handle division by zero
-              if (yesterday !== 0) {
-                percentageChange = ((today - yesterday) / yesterday) * 100;
-              } else {
-                percentageChange = 100;
-              }
+            // Fetch monthly consumption data for the same device
+            if (this.CompanyEmail) {
+              this.dashDataService.getMonthConsumption(this.CompanyEmail).subscribe(
+                (monthData: any[]) => {
+                  const monthlyConsumptionData = monthData[index][deviceInfo][0];
+                  const thisMonth = monthlyConsumptionData.thisMonth;
+                  const lastMonth = monthlyConsumptionData.lastMonth;
 
-            // Create an object with device information and percentage change
-            const deviceInfoObject = {
-              DeviceUID: deviceInfo,
-              todayConsumption: today,
-              yesterdayConsumption: yesterday,
-              percentageChange: percentageChange
-            };
+                  // Calculate monthly percentage change
+                  let monthlyPercentageChange: number;
+                  if (lastMonth !== 0) {
+                    monthlyPercentageChange = ((thisMonth - lastMonth) / lastMonth) * 100;
+                  } else {
+                    monthlyPercentageChange = 100;
+                  }
 
-            // Push the device object to the array
-            this.consumptionData.push(deviceInfoObject);
+                  // Create an object with combined information
+                  const deviceInfoObject = {
+                    DeviceUID: deviceInfo,
+                    todayConsumption: today,
+                    yesterdayConsumption: yesterday,
+                    dailyPercentageChange: dailyPercentageChange,
+                    thisMonthConsumption: (thisMonth / 1000).toFixed(0),
+                    lastMonthConsumption: (lastMonth / 1000).toFixed(0),
+                    monthlyPercentageChange: monthlyPercentageChange
+                  };
+
+                  // Push the device object to the array
+                  this.consumptionData.push(deviceInfoObject);
+                },
+                (monthError) => {
+                  console.log(monthError);
+                }
+              );
+            }
           });
         },
-        (error) => {
-          console.log(error);
+        (todayError) => {
+          console.log(todayError);
         }
       );
     }
   }
 
-  MonthConsumption() {
-    if (this.CompanyEmail) {
-      this.dashDataService.getMonthConsumption(this.CompanyEmail).subscribe(
-        (response: any) => {
-          // Check if 'data' property exists and is an object
-          const data = response;
-          if (typeof data === 'object' && data !== null) {
-            // Loop through each device
-            Object.keys(data).forEach(deviceInfo => {
-              // Get consumption data for the device
-              const consumptionData = data[deviceInfo][0];
 
-              // Find the corresponding device in consumptionData array
-              const deviceInfoObject = this.consumptionData.find(device => device.DeviceUID === deviceInfo);
-              
-              if (deviceInfoObject) {
-                // Calculate percentage change for monthly consumption
-                const thisMonth = consumptionData.thisMonth;
-                const lastMonth = consumptionData.lastMonth;
-                let percentageChange;
-
-                // Handle division by zero
-                if (lastMonth !== 0) {
-                  percentageChange = ((thisMonth - lastMonth) / lastMonth) * 100;
-                } else {
-                  // If lastMonth is 0, set percentageChange to 100
-                  percentageChange = 100;
-                }
-
-                // Update the device object with monthly consumption data
-                deviceInfoObject.thisMonthConsumption = thisMonth / 1000;
-                deviceInfoObject.lastMonthConsumption = lastMonth / 1000;
-                deviceInfoObject.monthlyPercentageChange = percentageChange;
-              }
-              console.log(this.consumptionData);
-            });
-          } else {
-            console.error('Invalid response format. Expected an object.');
-          }
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
-    }
-  }
 
 
 

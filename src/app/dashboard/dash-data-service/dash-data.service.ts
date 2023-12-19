@@ -174,5 +174,9 @@ export class DashDataService {
 
   getCustomConsumption(deviceId: string, startDate:any, endDate: any): Observable <any>{
     return this.http.get(`${this.API_URL}/ConsuptionByCustomBar/${deviceId}/${startDate}/${endDate}`);
+  } 
+
+  getDeviceData(CompanyEmail: string): Observable <any> {
+    return this.http.get(`${this.API_URL}/fetchLatestEntry/${CompanyEmail}`);
   }
 }
