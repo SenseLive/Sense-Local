@@ -52,6 +52,7 @@ export class TempComponent implements OnInit {
 
           interval(60 * 1000).subscribe(() => {
             this.getDeviceData();
+            this.CombinedConsumption();
           });
         },
         (error) => {
@@ -261,6 +262,7 @@ export class TempComponent implements OnInit {
 
                   // Push the device object to the array
                   this.consumptionData.push(deviceInfoObject);
+                  console.log(this.consumptionData);
                 },
                 (monthError) => {
                   console.log(monthError);
